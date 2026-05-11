@@ -1,0 +1,47 @@
+{
+  "name": "claude-lives",
+  "version": "0.1.0",
+  "description": "Memory isolation for Claude Code. Separate work, research, and side projects into fully isolated lives.",
+  "bin": {
+    "claude-lives": "./bin/claude-lives"
+  },
+  "scripts": {
+    "test": "bash tests/run_all.sh"
+  },
+  "keywords": [
+    "claude",
+    "claude-code",
+    "memory",
+    "context",
+    "isolation",
+    "ai",
+    "cli",
+    "productivity"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/yonkric/claude-lives.git"
+  },
+  "homepage": "https://github.com/yonkric/claude-lives#readme",
+  "bugs": {
+    "url": "https://github.com/yonkric/claude-lives/issues"
+  },
+  "files": [
+    "bin/",
+    "commands/",
+    "hooks/",
+    "lib/",
+    "templates/",
+    "migration/",
+    "install.sh",
+    "uninstall.sh",
+    "README.md",
+    "LICENSE",
+    "CHANGELOG.md"
+  ],
+  "os": [
+    "darwin",
+    "linux"
+  ]
+}

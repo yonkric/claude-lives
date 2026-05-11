@@ -1,0 +1,35 @@
+{
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
+  "name": "claude-lives",
+  "description": "Memory isolation for Claude Code",
+  "owner": {
+    "name": "yonkric"
+  },
+  "plugins": [
+    {
+      "name": "claude-lives",
+      "source": "./",
+      "description": "Separate work, research, and side projects into fully isolated lives that remember what you were doing.",
+      "version": "0.1.0",
+      "author": {
+        "name": "yonkric"
+      },
+      "homepage": "https://github.com/yonkric/claude-lives",
+      "repository": "https://github.com/yonkric/claude-lives",
+      "license": "MIT",
+      "keywords": [
+        "memory",
+        "context",
+        "isolation",
+        "productivity"
+      ],
+      "category": "workflow",
+      "tags": [
+        "memory",
+        "session",
+        "context-switching"
+      ],
+      "strict": false
+    }
+  ]
+}

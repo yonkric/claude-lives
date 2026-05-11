@@ -1,0 +1,7 @@
+name: {{LIFE_NAME}}
+created: {{DATE}}
+description: {{DESCRIPTION}}
+type: {{TYPE}}
+token_budget:
+  life: 4000
+  handover: 1500

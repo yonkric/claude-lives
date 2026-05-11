@@ -1,0 +1,7 @@
+life_token_budget: 4000
+handover_token_budget: 1500
+compression_threshold_pct: 80
+decay_session_threshold: 10
+snapshot_tool_threshold: 20
+snapshot_max_tokens: 150
+snapshot_enabled: true
