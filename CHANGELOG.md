@@ -2,6 +2,30 @@
 
 All notable changes to claude-lives are documented here.
 
+## [0.3.0] — 2026-05-11
+
+### Portable Export & Import
+
+**Problem:** Users working across machines (local + VM) needed a way to extract a single life or project and bring it to another machine. `/sync` exists but syncs ALL lives and requires git remote setup. Projects nested inside workspace lives couldn't be deployed standalone.
+
+**Key design insight:** Project storage structure is identical to life storage (memory.md, handover.md, sessions/, config.yaml). A project-to-life conversion is just a frontmatter patch — no structural transformation needed.
+
+**New skills:**
+- `/export` — bundles a life or project into a portable `.claude-life.tar.gz` archive
+  - Auto-detects scope: flat life, workspace, or project within workspace
+  - Includes `_export.json` manifest with format version, source machine, export type
+  - `--include-life-context` flag bundles parent life-level memory as `_parent_memory.md`
+  - Excludes transient files (snapshots, locks, session meta)
+- `/import-life` — imports the tarball on the target machine as a new flat life
+  - Validates manifest format and version
+  - Project exports auto-converted to standalone flat lives (frontmatter patched)
+  - `--here` flag places `.claude-life` marker and injects CLAUDE.md in current directory
+  - `--name` flag overrides the imported life name
+  - Handles name conflicts with user prompt (overwrite / rename / cancel)
+  - Creates global memory store if missing
+
+**Version bumps:** package.json, plugin.json, marketplace.json → 0.3.0
+
 ## [0.2.1] — 2026-05-11
 
 ### UX Edge Case Fixes
