@@ -6,13 +6,39 @@ Import a `.claude-life.tar.gz` archive (created by `/export`) into the current m
 
 ## Arguments
 
-Required: path to the `.claude-life.tar.gz` file.
+Optional: path to the `.claude-life.tar.gz` file. If omitted, auto-find searches common locations.
 
 Optional flags:
 - `--name {name}`: override the life name (default: use the name from the export manifest)
 - `--here`: also place the `.claude-life` marker in the current directory (making the current directory the life root). Without this flag, only the memory store is imported — you can place the marker later with `/new-life`.
 
-## Step 1: Validate the Archive
+## Step 1: Find and Validate the Archive
+
+### Auto-find (when no path argument given)
+
+Search these directories in order for files matching `*.claude-life.tar.gz`:
+
+```bash
+SEARCH_DIRS="$HOME $HOME/Downloads $HOME/Desktop $(pwd)"
+FOUND=()
+for dir in $SEARCH_DIRS; do
+  if [ -d "$dir" ]; then
+    while IFS= read -r f; do
+      FOUND+=("$f")
+    done < <(find "$dir" -maxdepth 1 -name "*.claude-life.tar.gz" -type f 2>/dev/null)
+  fi
+done
+```
+
+Deduplicate results (a file in `$HOME` may also match `$(pwd)` if you're in `$HOME`).
+
+**If no files found:** Tell the user: "No `.claude-life.tar.gz` files found in ~/, ~/Downloads/, ~/Desktop/, or the current directory. Either pass the path explicitly (`/import-life /path/to/file.tar.gz`) or move the tarball to one of those locations." and stop.
+
+**If exactly one file found:** Use it automatically after confirming with the user: "Found export archive: `{path}` — importing this file."
+
+**If multiple files found:** Use AskUserQuestion with header "Archive" listing each file as an option (label: filename, description: full path + file size + modification date). Include multiSelect: false.
+
+### Validate
 
 Verify the file exists and is a valid gzip tarball:
 

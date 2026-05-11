@@ -156,6 +156,8 @@ This deduplicates facts, archives old session logs, and decays stale information
 | `/sync` | Git commit and push `~/.claude-lives/` for cross-machine sync |
 | `/checkpoint` | Save a mid-session snapshot to preserve context before auto-compaction |
 | `/import-claude-mem` | Import from claude-mem database (see [Migrating from claude-mem](#migrating-from-claude-mem)) |
+| `/export` | Export life as a portable `.tar.gz` archive for another machine |
+| `/import-life` | Import a life from a `.claude-life.tar.gz` archive (auto-finds in ~/Downloads) |
 | `/cl-inject` | (Internal) Manually refresh the CLAUDE.md memory section |
 
 ## How It Works
@@ -284,6 +286,79 @@ In each life directory:
 ```
 
 This commits and pushes your memory store. On another machine, clone the repo to `~/.claude-lives/` and run the installer.
+
+## Exporting and Importing Lives
+
+Move a life between machines using `/export` and `/import-life`.
+
+### Export
+
+From any directory that has a life:
+
+```
+/export
+```
+
+This creates `~/{life-name}.claude-life.tar.gz` — a self-contained archive with your memory, handover, session logs, and config. You can pass a custom output path: `/export ~/Desktop/my-backup.tar.gz`.
+
+For workspace lives, you can export the whole workspace or a single project. Project exports become standalone flat lives on import.
+
+### Transfer
+
+Copy the `.claude-life.tar.gz` file to the target machine. Common approaches:
+
+- **Cloud storage**: Drop it in Google Drive, Dropbox, iCloud, etc. and download on the other machine. The file is small (typically under 1 MB).
+- **USB drive**: Copy directly.
+- **scp/rsync**: `scp ~/my-research.claude-life.tar.gz user@other-machine:~/`
+- **AirDrop** (macOS): Works for quick local transfers.
+
+**Where to put it on the target machine:** Anywhere works — `/import-life` auto-searches `~/`, `~/Downloads/`, `~/Desktop/`, and the current directory. The simplest option is to drop it in your home directory (`~/`) or Downloads folder.
+
+### Import
+
+On the target machine, with claude-lives installed:
+
+```
+/import-life
+```
+
+If you placed the tarball in `~/`, `~/Downloads/`, `~/Desktop/`, or the current directory, it's found automatically. Otherwise pass the path explicitly:
+
+```
+/import-life /path/to/my-research.claude-life.tar.gz
+```
+
+Options:
+- `--name {name}`: override the life name
+- `--here`: also place a `.claude-life` marker in the current directory (activates the life immediately)
+
+Without `--here`, only the memory store is imported to `~/.claude-lives/{name}/`. You can then `cd` to your project directory and run `/new-life` to connect it.
+
+### Typical workflow
+
+```
+# Machine A: export your PhD life
+cd ~/phd
+/export
+# → creates ~/phd.claude-life.tar.gz
+
+# Copy to Machine B (any method)
+scp ~/phd.claude-life.tar.gz user@machine-b:~/
+
+# Machine B: import
+cd ~/phd
+/import-life --here
+# → finds ~/phd.claude-life.tar.gz, imports memory, places .claude-life marker
+```
+
+### Export vs Sync
+
+| | `/export` + `/import-life` | `/sync` |
+|---|---|---|
+| **Use when** | Moving to a new machine, sharing a life, backup | Ongoing cross-machine sync |
+| **Mechanism** | One-time tarball | Git push/pull |
+| **Setup needed** | None | Git remote on `~/.claude-lives/` |
+| **Conflict handling** | Overwrites or renames | Git merge |
 
 ## Known Limitations
 

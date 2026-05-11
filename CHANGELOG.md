@@ -2,6 +2,15 @@
 
 All notable changes to claude-lives are documented here.
 
+## [0.3.5] — 2026-05-11
+
+### Import Auto-Find & Export/Import Docs
+
+- `/import-life` no longer requires a path argument — auto-searches `~/`, `~/Downloads/`, `~/Desktop/`, and current directory for `*.claude-life.tar.gz` files
+- Single match auto-selects; multiple matches prompt the user to choose
+- README: added "Exporting and Importing Lives" section with full workflow guide (export, transfer methods, import, typical workflow, export-vs-sync comparison)
+- README: added `/export` and `/import-life` to the commands table
+
 ## [0.3.4] — 2026-05-11
 
 ### Auto-Discover Skills in Installer

@@ -49,11 +49,11 @@ bash lib/token_count.sh <file>
 ## Life: claude-lives
 
 **Identity:** Claude Code plugin for life-context isolation. Pure markdown + bash + slash commands. Published at github.com/yonkric/claude-lives.
-**Focus:** v0.3.0 — added /export and /import-life for portable cross-machine workflows.
+**Focus:** v0.3.5 released. /import-life auto-find + README export/import docs. CI/CD auto-publishes via Trusted Publishing.
 **Last session:** 2026-05-11
-**Was doing:** Implemented /export and /import-life skills. Version bumped to 0.3.0.
-**Next:** - npm publish v0.3.0
-- Test export/import workflow (local → VM)
+**Was doing:** Implemented /export + /import-life, fixed 3 bugs, set up CI/CD with npm Trusted Publishing.
+**Next:** - npm publish v0.3.4 (last manual publish)
+- Test export/import on VM
 - Implement claude-code native memory backend (refactor commands to use ~/.claude/projects/<path>/memory/)
 
 ### Global
