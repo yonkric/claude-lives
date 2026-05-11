@@ -22,18 +22,19 @@ claude-lives ties memory to **directories** using a three-layer model:
 
 Memory persists across `/clear` because it lives in CLAUDE.md, which Claude Code reads automatically on every session start.
 
-## Installation
+## Quick Start
 
-### Quick Install (recommended)
+### As a Claude Code Plugin (recommended)
+
+```
+/plugin marketplace add yonkric/claude-lives
+/plugin install claude-lives@claude-lives
+```
+
+### Via npx
 
 ```bash
 npx claude-lives
-```
-
-### As a Claude Code Plugin
-
-```
-/plugin install claude-lives
 ```
 
 ### Manual Install
@@ -44,54 +45,9 @@ cd claude-lives
 ./install.sh
 ```
 
-This installs 13 slash commands, two hooks (Stop + PostToolUse), and creates the `~/.claude-lives/` memory store. Run `./uninstall.sh` to remove (your memory data is preserved unless you pass `--delete-data`).
-
-## Before You Start
-
-If you're using other Claude Code memory tools (claude-mem, claude-memory, etc.), **uninstall or disable them first**. Running multiple memory systems simultaneously causes conflicts — duplicate context injection, fighting over CLAUDE.md, bloated token usage, and unpredictable behavior.
-
-```bash
-# Example: disable claude-mem
-# 1. Import your data first (see Path A below)
-# 2. Then remove claude-mem's hooks from ~/.claude/settings.json
-# 3. Remove or rename ~/.claude-mem/ to avoid accidental re-activation
-```
-
-claude-lives replaces these tools entirely. After importing your data with `/import-claude-mem`, you won't need the old tool.
+All methods install 13 slash commands, two hooks (Stop + PostToolUse), and create the `~/.claude-lives/` memory store. Run `./uninstall.sh` to remove (your memory data is preserved unless you pass `--delete-data`).
 
 ## Getting Started
-
-There are two paths depending on whether you're coming from claude-mem or starting fresh.
-
-### Path A: Coming from claude-mem
-
-If you already have a claude-mem database with project memories, you can import them directly.
-
-**Per-directory (recommended):** Go to each project and import its matching claude-mem data:
-
-```bash
-cd ~/projects/my-research
-```
-```
-/import-claude-mem
-```
-
-claude-lives auto-detects the matching claude-mem project by directory name. It imports the observations and summaries, creates the `.claude-life` marker, and injects memory into your CLAUDE.md. Repeat for each project directory.
-
-**Bulk import:** Or import everything at once:
-
-```
-/import-claude-mem --all
-```
-
-This imports all claude-mem projects and then asks you which directory each one maps to.
-
-**Options:**
-- `--dry-run` — preview what would be imported without making changes
-- `--db /path/to/db` — use a custom database path (default: `~/.claude-mem/claude-mem.db`)
-- `--all` — bulk import all projects at once
-
-### Path B: Starting fresh
 
 Go to any project directory and create a new life:
 
@@ -168,9 +124,9 @@ This deduplicates facts, archives old session logs, and decays stale information
 | `/memory-status` | Token usage, session history, freshness, and token economics |
 | `/compact-memory` | Compress memory: deduplicate, archive old sessions, decay stale facts |
 | `/borrow <life>` | Read-only peek at another life's memory (doesn't modify anything) |
-| `/import-claude-mem` | Import from claude-mem database (per-directory or `--all` for bulk) |
 | `/sync` | Git commit and push `~/.claude-lives/` for cross-machine sync |
 | `/checkpoint` | Save a mid-session snapshot to preserve context before auto-compaction |
+| `/import-claude-mem` | Import from claude-mem database (see [Migrating from claude-mem](#migrating-from-claude-mem)) |
 | `/cl-inject` | (Internal) Manually refresh the CLAUDE.md memory section |
 
 ## How It Works
@@ -316,9 +272,47 @@ This commits and pushes your memory store. On another machine, clone the repo to
 | **v0.3** | Power features | Session tagging, /forget, /list-lives dashboard, /sync conflict handling |
 | **v1.0** | Team support | Gitignored injection target, CLAUDE_LIVES_READONLY mode, team-memory.md layer, /share command |
 
+## Additional Information
+
+### Migrating from claude-mem
+
+If you're coming from [claude-mem](https://github.com/thedotmack/claude-mem) or another Claude Code memory tool, **disable it first** to avoid conflicts (duplicate context injection, fighting over CLAUDE.md).
+
+Then import your data using `/import-claude-mem`:
+
+**Per-directory (recommended):**
+```bash
+cd ~/projects/my-research
+```
+```
+/import-claude-mem
+```
+
+claude-lives auto-detects the matching claude-mem project by directory name. Repeat for each project directory.
+
+**Bulk import:**
+```
+/import-claude-mem --all
+```
+
+**Options:**
+- `--dry-run` — preview what would be imported without making changes
+- `--db /path/to/db` — use a custom database path (default: `~/.claude-mem/claude-mem.db`)
+- `--all` — bulk import all projects at once
+
+After importing, remove claude-mem's hooks from `~/.claude/settings.json` and rename or remove `~/.claude-mem/` to prevent re-activation.
+
+### Conflict with other memory tools
+
+Running multiple memory systems simultaneously causes conflicts — duplicate context injection, fighting over CLAUDE.md, bloated token usage, and unpredictable behavior. Uninstall or disable other memory tools before using claude-lives.
+
 ## Requirements
 
 - Claude Code
 - bash
-- Python 3.8+ (for hook registration and claude-mem migration)
+- Python 3.8+ (for hook registration and migration)
 - git (for /sync)
+
+## License
+
+[MIT](LICENSE)

@@ -18,7 +18,6 @@ docs/            — Design docs, plan, test reports
 ## Key Architecture Decisions
 
 - Life detection uses `.claude-life` marker files (NOT CLAUDE.md frontmatter)
-- Memory injection goes INTO CLAUDE.md between `<!-- CLAUDE-LIVES:START -->` / `<!-- CLAUDE-LIVES:END -->` markers
 - Slash commands are the primary interface — Claude does the intelligence work
 - Token counting is approximate (4 chars ≈ 1 token) — soft budget
 - PostToolUse hook counts tool calls; CLAUDE.md instruction triggers mid-session snapshots to disk every ~20 calls to preserve context across auto-compaction
@@ -44,3 +43,31 @@ bash lib/token_count.sh <file>
 - Shell scripts: snake_case (e.g., `detect_life.sh`)
 - All shell scripts must be POSIX-compatible or explicitly require bash
 - Templates use `{{placeholder}}` syntax for substitution
+
+<!-- CLAUDE-LIVES:START:claude-lives -->
+## Life: claude-lives
+
+**Identity:** Claude Code plugin for life-context isolation. Pure markdown + bash + slash commands. Published at github.com/yonkric/claude-lives.
+**Focus:** v0.1.0 released and pushed to GitHub. Next: npm publish for npx support, then claude-code native memory backend.
+**Last session:** 2026-05-11
+**Was doing:** Completed v0.1.0 public release. Repo pushed to github.com/yonkric/claude-lives. All 329 tests passing. Hooks re-installed to correct paths.
+**Next:** - npm publish to enable npx claude-lives (need npm login first)
+- Create GitHub release: gh release create v0.1.0
+- Implement claude-code native memory backend (refactor commands to use ~/.claude/projects/<path>/memory/)
+
+### Global
+These preferences apply across all lives.
+
+### Full Memory (read when needed)
+- Life memory: `/Users/Lenovo/.claude-lives/claude-lives/memory.md`
+- Handover: `/Users/Lenovo/.claude-lives/claude-lives/handover.md`
+- Global: `/Users/Lenovo/.claude-lives/global/memory.md`
+- Sessions: `/Users/Lenovo/.claude-lives/claude-lives/sessions/`
+- Session meta: `/Users/Lenovo/.claude-lives/claude-lives/.last-session-meta.json`
+
+### Session Protocol
+- **On start**: Read `/Users/Lenovo/.claude-lives/claude-lives/.last-session-meta.json` — if `significant: true` and no `.last-saved` file is newer, previous session may be unsaved. Note this briefly.
+- **Mid-session snapshots**: A tool-call counter increments at `/Users/Lenovo/.claude-lives/claude-lives/.session-snapshots/counter`. When you read or write files and notice the counter exceeds 20, write a brief incremental summary (3-6 bullets, telegraphic) to `/Users/Lenovo/.claude-lives/claude-lives/.session-snapshots/snapshots.md` using the format `<!-- snapshot:N t:{ISO8601} tools:{counter} -->\n## Snapshot N\n- bullet`, then write `0` to the counter file. This preserves early work before auto-compaction erases it.
+- **Before ending**: If you modified files, made key decisions, or learned important context — run /save-session before your final response. Also trigger on closing phrases (goodbye, thanks, done, that's all). Skip only for single-question Q&A with no file changes.
+
+<!-- CLAUDE-LIVES:END -->
