@@ -2,6 +2,14 @@
 
 All notable changes to claude-lives are documented here.
 
+## [0.3.4] — 2026-05-11
+
+### Auto-Discover Skills in Installer
+
+**Problem:** `install.sh` maintained a hardcoded skills array. Every new skill required a manual update — easy to forget (caused the v0.3.3 bug).
+
+**Fix:** Replaced the hardcoded list with a glob over `skills/*/SKILL.md`. New skills are now automatically picked up by the installer without any changes to `install.sh`.
+
 ## [0.3.3] — 2026-05-11
 
 ### npx Install Missing New Skills

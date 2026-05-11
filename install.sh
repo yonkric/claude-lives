@@ -15,7 +15,7 @@ CLAUDE_DIR="$HOME/.claude"
 SKILLS_DIR="$CLAUDE_DIR/skills"
 SETTINGS_FILE="$CLAUDE_DIR/settings.json"
 LIB_DEST="$CLAUDE_DIR/claude-lives-lib"
-VERSION="0.3.3"
+VERSION="0.3.4"
 
 DRY_RUN=false
 HOOKS_ONLY=false
@@ -142,17 +142,13 @@ fi
 if ! $HOOKS_ONLY; then
     echo "Step 2: Installing skills to $SKILLS_DIR"
 
-    skills=("new-life" "save-session" "resume" "memory-status" "borrow" "compact-memory" "sync" "cl-inject" "import-claude-mem" "fresh" "search" "timeline" "checkpoint" "export" "import-life")
+    # Auto-discover skills from skills/ directory
+    installed_count=0
+    for src in "$SCRIPT_DIR"/skills/*/SKILL.md; do
+        [[ -f "$src" ]] || continue
+        skill="$(basename "$(dirname "$src")")"
 
-    for skill in "${skills[@]}"; do
-        src="$SCRIPT_DIR/skills/${skill}/SKILL.md"
         dest_dir="$SKILLS_DIR/${skill}"
-
-        if [[ ! -f "$src" ]]; then
-            warn "Source not found: $src"
-            continue
-        fi
-
         if $DRY_RUN; then
             info "Would copy: $skill/SKILL.md"
         else
@@ -160,16 +156,16 @@ if ! $HOOKS_ONLY; then
             cp "$src" "$dest_dir/SKILL.md"
             info "Installed /$skill"
         fi
-    done
+        installed_count=$((installed_count + 1))
 
-    # Clean up legacy commands/ from previous installs
-    OLD_COMMANDS_DIR="$CLAUDE_DIR/commands"
-    for skill in "${skills[@]}"; do
+        # Clean up legacy commands/ from previous installs
+        OLD_COMMANDS_DIR="$CLAUDE_DIR/commands"
         if [[ -f "$OLD_COMMANDS_DIR/${skill}.md" ]]; then
             rm -f "$OLD_COMMANDS_DIR/${skill}.md"
             info "Removed legacy command /${skill}"
         fi
     done
+    info "Total: $installed_count skills"
 
     echo ""
 fi

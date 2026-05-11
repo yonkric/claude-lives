@@ -1,6 +1,6 @@
 {
   "name": "claude-lives",
-  "version": "0.3.3",
+  "version": "0.3.4",
   "description": "Memory isolation for Claude Code. Separate work, research, and side projects into fully isolated lives.",
   "author": {
     "name": "yonkric",
