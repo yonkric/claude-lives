@@ -2,6 +2,14 @@
 
 All notable changes to claude-lives are documented here.
 
+## [0.3.2] — 2026-05-11
+
+### npx Symlink Fix
+
+**Problem:** `npx claude-lives` failed on Linux with "No such file or directory" for `install.sh`. npx creates a symlink from the bin entry to the actual package location, but `BASH_SOURCE[0]` resolved to the symlink path, not the real path — so `dirname + /..` landed in `node_modules/` instead of `node_modules/claude-lives/`.
+
+**Fix:** `bin/claude-lives` now resolves symlinks in a loop before computing `PACKAGE_DIR`. Also applies the `BASH_SOURCE[0]:-$0` zsh compatibility fix from v0.3.1.
+
 ## [0.3.1] — 2026-05-11
 
 ### zsh Compatibility Fix

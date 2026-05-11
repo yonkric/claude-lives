@@ -4,5 +4,12 @@ set -euo pipefail
 # claude-lives CLI entry point
 # Run via: npx claude-lives [--dry-run] [--hooks-only]
 
-PACKAGE_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+SCRIPT="${BASH_SOURCE[0]:-$0}"
+# Resolve symlinks (npx may symlink the bin entry)
+while [ -L "$SCRIPT" ]; do
+  DIR="$(cd "$(dirname "$SCRIPT")" && pwd)"
+  SCRIPT="$(readlink "$SCRIPT")"
+  [[ "$SCRIPT" != /* ]] && SCRIPT="$DIR/$SCRIPT"
+done
+PACKAGE_DIR="$(cd "$(dirname "$SCRIPT")/.." && pwd)"
 exec bash "$PACKAGE_DIR/install.sh" "$@"
