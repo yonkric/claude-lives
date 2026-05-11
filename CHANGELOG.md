@@ -2,6 +2,18 @@
 
 All notable changes to claude-lives are documented here.
 
+## [0.3.3] — 2026-05-11
+
+### npx Install Missing New Skills
+
+**Problem:** `install.sh` had a hardcoded skills list that didn't include `/export` and `/import-life`. npx installs use `install.sh`, so the new skills were never copied to `~/.claude/skills/`. Plugin marketplace installs were unaffected (auto-discovery via `skills/` directory).
+
+**Fix:**
+- Added `export` and `import-life` to the skills array in `install.sh`
+- Updated `VERSION` constant (was still `0.2.0`)
+- Updated command list in the installer's quick-start output
+- Applied `BASH_SOURCE[0]:-$0` fix to `install.sh`
+
 ## [0.3.2] — 2026-05-11
 
 ### npx Symlink Fix

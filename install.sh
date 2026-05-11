@@ -9,13 +9,13 @@ set -euo pipefail
 #
 # Usage: ./install.sh [--hooks-only] [--dry-run]
 
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]:-$0}")" && pwd)"
 LIVES_DIR="$HOME/.claude-lives"
 CLAUDE_DIR="$HOME/.claude"
 SKILLS_DIR="$CLAUDE_DIR/skills"
 SETTINGS_FILE="$CLAUDE_DIR/settings.json"
 LIB_DEST="$CLAUDE_DIR/claude-lives-lib"
-VERSION="0.2.0"
+VERSION="0.3.3"
 
 DRY_RUN=false
 HOOKS_ONLY=false
@@ -142,7 +142,7 @@ fi
 if ! $HOOKS_ONLY; then
     echo "Step 2: Installing skills to $SKILLS_DIR"
 
-    skills=("new-life" "save-session" "resume" "memory-status" "borrow" "compact-memory" "sync" "cl-inject" "import-claude-mem" "fresh" "search" "timeline" "checkpoint")
+    skills=("new-life" "save-session" "resume" "memory-status" "borrow" "compact-memory" "sync" "cl-inject" "import-claude-mem" "fresh" "search" "timeline" "checkpoint" "export" "import-life")
 
     for skill in "${skills[@]}"; do
         src="$SCRIPT_DIR/skills/${skill}/SKILL.md"
@@ -299,4 +299,5 @@ echo "Coming from claude-mem?"
 echo "  Run /import-claude-mem in each project directory to import your data"
 echo ""
 echo "Commands: /new-life, /save-session, /resume, /fresh, /memory-status,"
-echo "          /compact-memory, /borrow, /sync, /import-claude-mem, /cl-inject (internal)"
+echo "          /compact-memory, /borrow, /sync, /export, /import-life,"
+echo "          /import-claude-mem, /cl-inject (internal)"
