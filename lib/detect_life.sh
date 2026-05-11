@@ -87,7 +87,7 @@ detect_life_type() {
     life_root=$(get_life_root "$start_dir") || { echo "flat"; return 0; }
 
     local life_type
-    life_type=$(grep -E '^type:' "$life_root/.claude-life" 2>/dev/null | head -1 | sed 's/^type:[[:space:]]*//')
+    life_type=$(grep -E '^type:' "$life_root/.claude-life" 2>/dev/null | head -1 | sed 's/^type:[[:space:]]*//' || true)
 
     if [[ "$life_type" == "workspace" ]]; then
         echo "workspace"
