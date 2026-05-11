@@ -2,6 +2,13 @@
 
 All notable changes to claude-lives are documented here.
 
+## [0.3.6] — 2026-05-11
+
+### Fix CI/CD Trusted Publishing
+
+- Fixed npm publish workflow: Node 20 (npm v10) doesn't support OIDC token exchange — upgraded to Node 24 (npm v11.5+)
+- Removed `registry-url` from `setup-node` step — it injected a phantom `NODE_AUTH_TOKEN` that overrode OIDC authentication
+
 ## [0.3.5] — 2026-05-11
 
 ### Import Auto-Find & Export/Import Docs
