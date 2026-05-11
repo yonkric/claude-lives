@@ -12,7 +12,7 @@ set -euo pipefail
 # When project_name is provided, injects project-specific context alongside
 # life-level context (three-layer model: global → life → project).
 
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]:-}")" && pwd)"
 source "$SCRIPT_DIR/config_defaults.sh"
 source "$SCRIPT_DIR/snapshot.sh"
 
@@ -439,7 +439,7 @@ inject_memory() {
     write_block_to_file "$claude_md" "$life_name" "$block"
 }
 
-if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
+if [[ "${BASH_SOURCE[0]:-}" == "${0}" ]]; then
     if [[ $# -lt 2 ]]; then
         echo "Usage: inject_memory.sh <claude_md_path> <life_name> [--progressive|--full] [project_name]" >&2
         exit 1

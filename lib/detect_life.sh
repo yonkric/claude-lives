@@ -187,6 +187,6 @@ EOF
     echo "Auto-initialized project: $project_name (under $life_name)" >&2
 }
 
-if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
+if [[ "${BASH_SOURCE[0]:-}" == "${0}" ]]; then
     detect_life "$@"
 fi

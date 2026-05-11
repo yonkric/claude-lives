@@ -11,7 +11,7 @@
 # Slow path (first call): sources libraries, detects life, initializes
 # snapshot session, writes the sentinel, then increments.
 
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]:-}")" && pwd)"
 LIB_DIR="$SCRIPT_DIR/../lib"
 LIVES_DIR="${CLAUDE_LIVES_DIR:-$HOME/.claude-lives}"
 # Use PPID (Claude Code process) to make sentinel session-specific,

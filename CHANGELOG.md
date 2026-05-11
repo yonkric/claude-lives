@@ -2,6 +2,20 @@
 
 All notable changes to claude-lives are documented here.
 
+## [0.3.1] — 2026-05-11
+
+### zsh Compatibility Fix
+
+**Problem:** All shell scripts used `${BASH_SOURCE[0]}` without a default value. When sourced in zsh (macOS default shell), `set -u` made this fatal because `BASH_SOURCE` is unset in zsh. This caused `/export` and other skills to fail when Claude tried to source library scripts.
+
+**Fix:** Changed all `${BASH_SOURCE[0]}` to `${BASH_SOURCE[0]:-}` across 5 files:
+- `lib/detect_life.sh`
+- `lib/inject_memory.sh`
+- `lib/token_count.sh`
+- `lib/snapshot.sh`
+- `hooks/post_tool_hook.sh`
+- `hooks/stop_hook.sh`
+
 ## [0.3.0] — 2026-05-11
 
 ### Portable Export & Import

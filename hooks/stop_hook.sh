@@ -10,7 +10,7 @@ set -euo pipefail
 # Reads JSON from stdin (Claude Code provides transcript_path).
 # Registered as a Stop hook in ~/.claude/settings.json
 
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]:-}")" && pwd)"
 LIB_DIR="$SCRIPT_DIR/../lib"
 
 source "$LIB_DIR/config_defaults.sh"

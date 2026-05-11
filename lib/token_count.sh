@@ -38,7 +38,7 @@ count_tokens_dir() {
     echo "$total"
 }
 
-if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
+if [[ "${BASH_SOURCE[0]:-}" == "${0}" ]]; then
     case "${1:-}" in
         --string)
             count_tokens_string "${2:-}"

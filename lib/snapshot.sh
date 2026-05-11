@@ -6,7 +6,7 @@ set -euo pipefail
 #
 # Scratch files live in .session-snapshots/ under the active life/project directory.
 
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]:-}")" && pwd)"
 source "$SCRIPT_DIR/config_defaults.sh"
 source "$SCRIPT_DIR/detect_life.sh"
 

@@ -64,7 +64,7 @@ Write a temporary `_export.json` manifest that will be included in the tarball:
   "project_name": "{project_name or null}",
   "parent_life_name": "{parent life name, only for project exports}",
   "includes_life_context": {true|false},
-  "claude_lives_version": "0.2.1"
+  "claude_lives_version": "0.3.1"
 }
 ```
 
