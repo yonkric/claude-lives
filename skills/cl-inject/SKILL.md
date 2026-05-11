@@ -1,5 +1,6 @@
 ---
 description: Update the CLAUDE.md memory section for the current life (internal helper)
+disable-model-invocation: true
 ---
 
 Update the CLAUDE.md memory section for the current life. This is typically called by other commands (/save-session, /compact-memory) but can be run manually.

@@ -5,7 +5,7 @@ Claude Code plugin for life-context isolation. Pure markdown + bash + slash comm
 ## Project Structure
 
 ```
-commands/        — Slash command markdown files (the main interface)
+skills/          — Skill directories (each has SKILL.md — the main interface)
 hooks/           — Shell scripts registered as Claude Code hooks (Stop + PostToolUse)
 lib/             — Shared bash utilities (detection, token counting, snapshots)
 templates/       — File templates for life creation
@@ -39,7 +39,7 @@ bash lib/token_count.sh <file>
 
 ## File Conventions
 
-- Slash commands: lowercase with hyphens (e.g., `save-session.md`)
+- Skills: lowercase with hyphens, each in its own directory (e.g., `skills/save-session/SKILL.md`)
 - Shell scripts: snake_case (e.g., `detect_life.sh`)
 - All shell scripts must be POSIX-compatible or explicitly require bash
 - Templates use `{{placeholder}}` syntax for substitution

@@ -23,25 +23,25 @@ echo ""
 echo "--- Slash Command Validation ---"
 
 # Test 1: compact-memory.md exists and has required sections
-if [[ -f "$SRC/commands/compact-memory.md" ]] && \
-   grep -q "Detect Life" "$SRC/commands/compact-memory.md" && \
-   grep -q "Compressed Memory" "$SRC/commands/compact-memory.md" && \
-   grep -q "Archive" "$SRC/commands/compact-memory.md" && \
-   grep -q "token_budget\|budget" "$SRC/commands/compact-memory.md"; then
+if [[ -f "$SRC/skills/compact-memory/SKILL.md" ]] && \
+   grep -q "Detect Life" "$SRC/skills/compact-memory/SKILL.md" && \
+   grep -q "Compressed Memory" "$SRC/skills/compact-memory/SKILL.md" && \
+   grep -q "Archive" "$SRC/skills/compact-memory/SKILL.md" && \
+   grep -q "token_budget\|budget" "$SRC/skills/compact-memory/SKILL.md"; then
     pass "compact-memory.md has all required sections"
 else
     fail "compact-memory.md" "missing required sections"
 fi
 
 # Test 2: compact-memory.md mentions dedup
-if grep -q "duplicat\|dedup\|already in memory\|genuinely new" "$SRC/commands/compact-memory.md"; then
+if grep -q "duplicat\|dedup\|already in memory\|genuinely new" "$SRC/skills/compact-memory/SKILL.md"; then
     pass "compact-memory.md includes deduplication guidance"
 else
     fail "compact-memory.md dedup" "no mention of deduplication"
 fi
 
 # Test 3: compact-memory.md mentions decay/archival
-if grep -q "old facts\|not referenced\|archive\|Historical\|10 sessions" "$SRC/commands/compact-memory.md"; then
+if grep -q "old facts\|not referenced\|archive\|Historical\|10 sessions" "$SRC/skills/compact-memory/SKILL.md"; then
     pass "compact-memory.md includes memory decay guidance"
 else
     fail "compact-memory.md decay" "no mention of decay/archival"
@@ -211,7 +211,7 @@ echo ""
 echo "--- Memory Decay ---"
 
 # Test 11: compact-memory.md mentions the 10-session threshold
-if grep -q "10 sessions" "$SRC/commands/compact-memory.md"; then
+if grep -q "10 sessions" "$SRC/skills/compact-memory/SKILL.md"; then
     pass "Decay threshold (10 sessions) documented in compact-memory"
 else
     fail "Decay threshold docs" "10-session threshold not mentioned"

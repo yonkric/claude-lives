@@ -24,21 +24,21 @@ echo ""
 echo "--- Slash Commands ---"
 
 # Test 1: new-life.md exists and has frontmatter
-if [[ -f "$SRC/commands/new-life.md" ]] && grep -q "^description:" "$SRC/commands/new-life.md"; then
+if [[ -f "$SRC/skills/new-life/SKILL.md" ]] && grep -q "^description:" "$SRC/skills/new-life/SKILL.md"; then
     pass "new-life.md exists with frontmatter"
 else
     fail "new-life.md" "missing or no frontmatter"
 fi
 
 # Test 2: cl-inject.md exists
-if [[ -f "$SRC/commands/cl-inject.md" ]] && grep -q "^description:" "$SRC/commands/cl-inject.md"; then
+if [[ -f "$SRC/skills/cl-inject/SKILL.md" ]] && grep -q "^description:" "$SRC/skills/cl-inject/SKILL.md"; then
     pass "cl-inject.md exists with frontmatter"
 else
     fail "cl-inject.md" "missing or no frontmatter"
 fi
 
 # Test 3: new-life.md contains interview questions (reduced to 2 in v1.7)
-question_count=$(grep -c "^\d\." "$SRC/commands/new-life.md" 2>/dev/null || grep -c "^[0-9]\." "$SRC/commands/new-life.md" 2>/dev/null || echo 0)
+question_count=$(grep -c "^\d\." "$SRC/skills/new-life/SKILL.md" 2>/dev/null || grep -c "^[0-9]\." "$SRC/skills/new-life/SKILL.md" 2>/dev/null || echo 0)
 if [[ "$question_count" -ge 2 ]]; then
     pass "new-life.md has 2+ interview questions"
 else
@@ -47,7 +47,7 @@ fi
 
 # Test 4: new-life.md references all required file paths
 for path in ".claude-life" "memory.md" "handover.md" "config.yaml" "CLAUDE.md"; do
-    if ! grep -q "$path" "$SRC/commands/new-life.md"; then
+    if ! grep -q "$path" "$SRC/skills/new-life/SKILL.md"; then
         fail "new-life.md references $path" "not mentioned"
     fi
 done

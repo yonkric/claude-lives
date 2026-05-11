@@ -520,35 +520,35 @@ echo ""
 echo "--- Command Documentation ---"
 
 # Test 28: new-life.md asks about workspace vs flat
-if grep -q "workspace" "$SRC_DIR/commands/new-life.md" && grep -q "type:" "$SRC_DIR/commands/new-life.md"; then
+if grep -q "workspace" "$SRC_DIR/skills/new-life/SKILL.md" && grep -q "type:" "$SRC_DIR/skills/new-life/SKILL.md"; then
     pass "new-life.md includes workspace/flat type question"
 else
     fail "new-life.md includes workspace/flat type question"
 fi
 
 # Test 29: save-session.md handles workspace projects
-if grep -q "Workspace project" "$SRC_DIR/commands/save-session.md" || grep -q "workspace project" "$SRC_DIR/commands/save-session.md"; then
+if grep -q "Workspace project" "$SRC_DIR/skills/save-session/SKILL.md" || grep -q "workspace project" "$SRC_DIR/skills/save-session/SKILL.md"; then
     pass "save-session.md documents workspace project handling"
 else
     fail "save-session.md documents workspace project handling"
 fi
 
 # Test 30: resume.md handles workspace projects
-if grep -q "Workspace project" "$SRC_DIR/commands/resume.md" || grep -q "workspace project" "$SRC_DIR/commands/resume.md"; then
+if grep -q "Workspace project" "$SRC_DIR/skills/resume/SKILL.md" || grep -q "workspace project" "$SRC_DIR/skills/resume/SKILL.md"; then
     pass "resume.md documents workspace project handling"
 else
     fail "resume.md documents workspace project handling"
 fi
 
 # Test 31: memory-status.md shows project info
-if grep -q "Project:" "$SRC_DIR/commands/memory-status.md" && grep -q "workspace" "$SRC_DIR/commands/memory-status.md"; then
+if grep -q "Project:" "$SRC_DIR/skills/memory-status/SKILL.md" && grep -q "workspace" "$SRC_DIR/skills/memory-status/SKILL.md"; then
     pass "memory-status.md shows project info for workspaces"
 else
     fail "memory-status.md shows project info for workspaces"
 fi
 
 # Test 32: cl-inject.md shows project injection format
-if grep -q "Project:" "$SRC_DIR/commands/cl-inject.md" && grep -q "Project Context" "$SRC_DIR/commands/cl-inject.md"; then
+if grep -q "Project:" "$SRC_DIR/skills/cl-inject/SKILL.md" && grep -q "Project Context" "$SRC_DIR/skills/cl-inject/SKILL.md"; then
     pass "cl-inject.md documents project injection format"
 else
     fail "cl-inject.md documents project injection format"
@@ -562,7 +562,7 @@ else
 fi
 
 # Test 34: borrow.md supports project borrowing
-if grep -q "project" "$SRC_DIR/commands/borrow.md"; then
+if grep -q "project" "$SRC_DIR/skills/borrow/SKILL.md"; then
     pass "borrow.md supports project-level borrowing"
 else
     fail "borrow.md supports project-level borrowing"

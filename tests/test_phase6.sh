@@ -73,17 +73,17 @@ else
     fail "Installer memory store" "global directory or memory.md missing"
 fi
 
-# Test 5: Slash commands installed
-installed_commands=0
-for cmd in new-life save-session resume memory-status borrow compact-memory sync cl-inject import-claude-mem fresh search timeline checkpoint; do
-    if [[ -f "$FAKE_HOME/.claude/commands/${cmd}.md" ]]; then
-        ((installed_commands++))
+# Test 5: Skills installed
+installed_skills=0
+for skill in new-life save-session resume memory-status borrow compact-memory sync cl-inject import-claude-mem fresh search timeline checkpoint; do
+    if [[ -f "$FAKE_HOME/.claude/skills/${skill}/SKILL.md" ]]; then
+        ((installed_skills++))
     fi
 done
-if [[ $installed_commands -eq 13 ]]; then
-    pass "All 13 slash commands installed"
+if [[ $installed_skills -eq 13 ]]; then
+    pass "All 13 skills installed"
 else
-    fail "Slash command installation" "only $installed_commands of 13 installed"
+    fail "Skill installation" "only $installed_skills of 13 installed"
 fi
 
 # Test 6: Hooks registered
@@ -127,17 +127,17 @@ echo ""
 
 echo "--- Uninstaller (sandboxed) ---"
 
-# Test 10: Uninstall removes commands and hooks but keeps data
+# Test 10: Uninstall removes skills and hooks but keeps data
 (
     export HOME="$FAKE_HOME"
     bash "$PROJECT_DIR/uninstall.sh" 2>&1
 ) > "$SANDBOX/uninstall_output.txt" 2>&1 || true
 
-remaining_commands=$(find "$FAKE_HOME/.claude/commands" -name "*.md" -path "*new-life*" -o -name "*.md" -path "*save-session*" -o -name "*.md" -path "*resume*" | wc -l | tr -d ' ')
-if [[ "$remaining_commands" -eq 0 ]]; then
-    pass "Uninstaller removes slash commands"
+remaining_skills=$(find "$FAKE_HOME/.claude/skills" -name "SKILL.md" -path "*new-life*" -o -name "SKILL.md" -path "*save-session*" -o -name "SKILL.md" -path "*resume*" 2>/dev/null | wc -l | tr -d ' ')
+if [[ "$remaining_skills" -eq 0 ]]; then
+    pass "Uninstaller removes skills"
 else
-    fail "Uninstaller commands" "$remaining_commands commands remain"
+    fail "Uninstaller skills" "$remaining_skills skills remain"
 fi
 
 # Test 11: Data preserved after uninstall
@@ -235,9 +235,9 @@ echo ""
 echo "--- Sync Command ---"
 
 # Test 19: sync.md exists and has correct structure
-if [[ -f "$SRC/commands/sync.md" ]] && \
-   grep -q "git" "$SRC/commands/sync.md" && \
-   grep -q "commit\|push" "$SRC/commands/sync.md"; then
+if [[ -f "$SRC/skills/sync/SKILL.md" ]] && \
+   grep -q "git" "$SRC/skills/sync/SKILL.md" && \
+   grep -q "commit\|push" "$SRC/skills/sync/SKILL.md"; then
     pass "sync.md has git commit/push instructions"
 else
     fail "sync.md" "missing git instructions"

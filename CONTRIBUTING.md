@@ -38,7 +38,7 @@ All tests must pass before submitting a PR.
 ## Project Structure
 
 ```
-commands/        — Slash command markdown files (the user-facing interface)
+skills/          — Skill directories (each has SKILL.md — the user-facing interface)
 hooks/           — Shell scripts registered as Claude Code hooks
 lib/             — Shared bash utilities
 templates/       — File templates for life creation

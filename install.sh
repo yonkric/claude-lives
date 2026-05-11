@@ -9,7 +9,7 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 LIVES_DIR="$HOME/.claude-lives"
 CLAUDE_DIR="$HOME/.claude"
-COMMANDS_DIR="$CLAUDE_DIR/commands"
+SKILLS_DIR="$CLAUDE_DIR/skills"
 SETTINGS_FILE="$CLAUDE_DIR/settings.json"
 LIB_DEST="$CLAUDE_DIR/claude-lives-lib"
 
@@ -134,17 +134,16 @@ GITIGNORE
     echo ""
 fi
 
-# ─── Step 2: Install slash commands ───
+# ─── Step 2: Install skills ───
 
 if ! $HOOKS_ONLY; then
-    echo "Step 2: Installing slash commands to $COMMANDS_DIR"
-    mkdir -p "$COMMANDS_DIR"
+    echo "Step 2: Installing skills to $SKILLS_DIR"
 
-    commands=("new-life" "save-session" "resume" "memory-status" "borrow" "compact-memory" "sync" "cl-inject" "import-claude-mem" "fresh" "search" "timeline" "checkpoint")
+    skills=("new-life" "save-session" "resume" "memory-status" "borrow" "compact-memory" "sync" "cl-inject" "import-claude-mem" "fresh" "search" "timeline" "checkpoint")
 
-    for cmd in "${commands[@]}"; do
-        src="$SCRIPT_DIR/commands/${cmd}.md"
-        dest="$COMMANDS_DIR/${cmd}.md"
+    for skill in "${skills[@]}"; do
+        src="$SCRIPT_DIR/skills/${skill}/SKILL.md"
+        dest_dir="$SKILLS_DIR/${skill}"
 
         if [[ ! -f "$src" ]]; then
             warn "Source not found: $src"
@@ -152,12 +151,22 @@ if ! $HOOKS_ONLY; then
         fi
 
         if $DRY_RUN; then
-            info "Would copy: $cmd.md"
+            info "Would copy: $skill/SKILL.md"
         else
-            cp "$src" "$dest"
-            info "Installed /$cmd"
+            mkdir -p "$dest_dir"
+            cp "$src" "$dest_dir/SKILL.md"
+            info "Installed /$skill"
         fi
     done
+
+    # Clean up legacy commands/ from previous installs
+    OLD_COMMANDS_DIR="$CLAUDE_DIR/commands"
+    for skill in "${skills[@]}"; do
+        if [[ -f "$OLD_COMMANDS_DIR/${skill}.md" ]]; then
+            rm -f "$OLD_COMMANDS_DIR/${skill}.md"
+        fi
+    done
+
     echo ""
 fi
 

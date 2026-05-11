@@ -293,7 +293,7 @@ else
 fi
 
 # Test 25: checkpoint command exists
-if [[ -f "$SRC_DIR/commands/checkpoint.md" ]]; then
+if [[ -f "$SRC_DIR/skills/checkpoint/SKILL.md" ]]; then
     pass "checkpoint.md command exists"
 else
     fail "checkpoint.md command exists"
@@ -331,14 +331,14 @@ echo ""
 echo "=== Save-Session Integration ==="
 
 # Test 29: save-session.md includes snapshot merge step
-if grep -q "Step 2.5" "$SRC_DIR/commands/save-session.md" && grep -q "Session Snapshots" "$SRC_DIR/commands/save-session.md"; then
+if grep -q "Step 2.5" "$SRC_DIR/skills/save-session/SKILL.md" && grep -q "Session Snapshots" "$SRC_DIR/skills/save-session/SKILL.md"; then
     pass "save-session includes snapshot merge step"
 else
     fail "save-session includes snapshot merge step"
 fi
 
 # Test 30: save-session.md includes snapshot cleanup step
-if grep -q "Step 7.5" "$SRC_DIR/commands/save-session.md" && grep -q "Clean Up Snapshots" "$SRC_DIR/commands/save-session.md"; then
+if grep -q "Step 7.5" "$SRC_DIR/skills/save-session/SKILL.md" && grep -q "Clean Up Snapshots" "$SRC_DIR/skills/save-session/SKILL.md"; then
     pass "save-session includes snapshot cleanup step"
 else
     fail "save-session includes snapshot cleanup step"
@@ -348,7 +348,7 @@ echo ""
 echo "=== Resume Integration ==="
 
 # Test 31: resume.md includes snapshot recovery
-if grep -q "preserved snapshots" "$SRC_DIR/commands/resume.md" && grep -q "has_snapshots" "$SRC_DIR/commands/resume.md"; then
+if grep -q "preserved snapshots" "$SRC_DIR/skills/resume/SKILL.md" && grep -q "has_snapshots" "$SRC_DIR/skills/resume/SKILL.md"; then
     pass "resume includes snapshot recovery"
 else
     fail "resume includes snapshot recovery"

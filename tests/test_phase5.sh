@@ -22,33 +22,33 @@ echo ""
 echo "--- Slash Command Validation ---"
 
 # Test 1: memory-status.md has required sections
-if [[ -f "$SRC/commands/memory-status.md" ]] && \
-   grep -q "Token Usage" "$SRC/commands/memory-status.md" && \
-   grep -q "Session History" "$SRC/commands/memory-status.md" && \
-   grep -q "Freshness" "$SRC/commands/memory-status.md"; then
+if [[ -f "$SRC/skills/memory-status/SKILL.md" ]] && \
+   grep -q "Token Usage" "$SRC/skills/memory-status/SKILL.md" && \
+   grep -q "Session History" "$SRC/skills/memory-status/SKILL.md" && \
+   grep -q "Freshness" "$SRC/skills/memory-status/SKILL.md"; then
     pass "memory-status.md has Token Usage, Session History, and Freshness"
 else
     fail "memory-status.md" "missing required sections"
 fi
 
 # Test 2: memory-status.md handles no-life case
-if grep -q "No life detected\|no life\|not found" "$SRC/commands/memory-status.md"; then
+if grep -q "No life detected\|no life\|not found" "$SRC/skills/memory-status/SKILL.md"; then
     pass "memory-status.md handles no-life scenario"
 else
     fail "memory-status.md no-life" "no fallback for missing life"
 fi
 
 # Test 3: borrow.md has required sections
-if [[ -f "$SRC/commands/borrow.md" ]] && \
-   grep -q "read-only\|read only\|NOT.*modify\|Do NOT modify" "$SRC/commands/borrow.md" && \
-   grep -q "temporary\|won't persist\|will be gone" "$SRC/commands/borrow.md"; then
+if [[ -f "$SRC/skills/borrow/SKILL.md" ]] && \
+   grep -q "read-only\|read only\|NOT.*modify\|Do NOT modify" "$SRC/skills/borrow/SKILL.md" && \
+   grep -q "temporary\|won't persist\|will be gone" "$SRC/skills/borrow/SKILL.md"; then
     pass "borrow.md enforces read-only and temporary access"
 else
     fail "borrow.md" "missing isolation guarantees"
 fi
 
 # Test 4: borrow.md handles missing life
-if grep -q "not found\|Available lives\|does not exist" "$SRC/commands/borrow.md"; then
+if grep -q "not found\|Available lives\|does not exist" "$SRC/skills/borrow/SKILL.md"; then
     pass "borrow.md handles non-existent life"
 else
     fail "borrow.md missing life" "no error handling for non-existent life"

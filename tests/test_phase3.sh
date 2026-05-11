@@ -23,35 +23,35 @@ echo ""
 echo "--- Slash Command Validation ---"
 
 # Test 1: save-session.md has required sections
-if grep -q "Detect Life" "$SRC/commands/save-session.md" && \
-   grep -q "Session Summary" "$SRC/commands/save-session.md" && \
-   grep -q "Handover" "$SRC/commands/save-session.md" && \
-   grep -q "CLAUDE-LIVES:START" "$SRC/commands/save-session.md"; then
+if grep -q "Detect Life" "$SRC/skills/save-session/SKILL.md" && \
+   grep -q "Session Summary" "$SRC/skills/save-session/SKILL.md" && \
+   grep -q "Handover" "$SRC/skills/save-session/SKILL.md" && \
+   grep -q "CLAUDE-LIVES:START" "$SRC/skills/save-session/SKILL.md"; then
     pass "save-session.md has all required sections"
 else
     fail "save-session.md sections" "missing required sections"
 fi
 
 # Test 2: save-session.md mentions token budget
-if grep -q "token_budget\|token budget\|budget" "$SRC/commands/save-session.md"; then
+if grep -q "token_budget\|token budget\|budget" "$SRC/skills/save-session/SKILL.md"; then
     pass "save-session.md includes token budget awareness"
 else
     fail "save-session.md budget" "no mention of token budget"
 fi
 
 # Test 3: resume.md has required sections
-if grep -q "handover" "$SRC/commands/resume.md" && \
-   grep -q "memory" "$SRC/commands/resume.md" && \
-   grep -q "unsaved\|last-session" "$SRC/commands/resume.md"; then
+if grep -q "handover" "$SRC/skills/resume/SKILL.md" && \
+   grep -q "memory" "$SRC/skills/resume/SKILL.md" && \
+   grep -q "unsaved\|last-session" "$SRC/skills/resume/SKILL.md"; then
     pass "resume.md has handover, memory, and stale detection"
 else
     fail "resume.md sections" "missing required sections"
 fi
 
 # Test 4: save-session.md includes session log schema
-if grep -q "## Summary" "$SRC/commands/save-session.md" && \
-   grep -q "## Completed" "$SRC/commands/save-session.md" && \
-   grep -q "## Pending" "$SRC/commands/save-session.md"; then
+if grep -q "## Summary" "$SRC/skills/save-session/SKILL.md" && \
+   grep -q "## Completed" "$SRC/skills/save-session/SKILL.md" && \
+   grep -q "## Pending" "$SRC/skills/save-session/SKILL.md"; then
     pass "save-session.md defines session log schema"
 else
     fail "save-session.md schema" "missing session log schema"

@@ -363,22 +363,22 @@ echo ""
 echo "=== Save-Session .last-saved Tests ==="
 
 # Test 22: save-session.md mentions .last-saved
-if grep -q '.last-saved' "$SRC_DIR/commands/save-session.md"; then
+if grep -q '.last-saved' "$SRC_DIR/skills/save-session/SKILL.md"; then
     pass "save-session.md documents .last-saved marker"
 else
     fail "save-session.md documents .last-saved marker"
 fi
 
 # Test 23: save-session.md has Step 7 for marking saved
-if grep -q 'Mark Session as Saved' "$SRC_DIR/commands/save-session.md"; then
+if grep -q 'Mark Session as Saved' "$SRC_DIR/skills/save-session/SKILL.md"; then
     pass "save-session.md has 'Mark Session as Saved' step"
 else
     fail "save-session.md has 'Mark Session as Saved' step"
 fi
 
 # Test 24: save-session.md mentions flat and workspace paths
-if grep -q 'Flat life.*last-saved' "$SRC_DIR/commands/save-session.md" && \
-   grep -q 'Workspace project.*last-saved' "$SRC_DIR/commands/save-session.md"; then
+if grep -q 'Flat life.*last-saved' "$SRC_DIR/skills/save-session/SKILL.md" && \
+   grep -q 'Workspace project.*last-saved' "$SRC_DIR/skills/save-session/SKILL.md"; then
     pass "save-session.md covers both flat and workspace .last-saved paths"
 else
     fail "save-session.md covers both flat and workspace .last-saved paths"
@@ -389,28 +389,28 @@ echo ""
 echo "=== Resume Stale Detection Tests ==="
 
 # Test 25: resume.md references .last-session-meta.json
-if grep -q 'last-session-meta.json' "$SRC_DIR/commands/resume.md"; then
+if grep -q 'last-session-meta.json' "$SRC_DIR/skills/resume/SKILL.md"; then
     pass "resume.md references .last-session-meta.json"
 else
     fail "resume.md references .last-session-meta.json"
 fi
 
 # Test 26: resume.md references .last-saved for comparison
-if grep -q '.last-saved' "$SRC_DIR/commands/resume.md"; then
+if grep -q '.last-saved' "$SRC_DIR/skills/resume/SKILL.md"; then
     pass "resume.md references .last-saved for stale comparison"
 else
     fail "resume.md references .last-saved for stale comparison"
 fi
 
 # Test 27: resume.md includes significance-aware logic
-if grep -q 'significant.*true' "$SRC_DIR/commands/resume.md"; then
+if grep -q 'significant.*true' "$SRC_DIR/skills/resume/SKILL.md"; then
     pass "resume.md has significance-aware stale detection"
 else
     fail "resume.md has significance-aware stale detection"
 fi
 
 # Test 28: resume.md has fallback for missing meta file
-if grep -q 'Fallback' "$SRC_DIR/commands/resume.md"; then
+if grep -q 'Fallback' "$SRC_DIR/skills/resume/SKILL.md"; then
     pass "resume.md has fallback detection for missing meta file"
 else
     fail "resume.md has fallback detection for missing meta file"

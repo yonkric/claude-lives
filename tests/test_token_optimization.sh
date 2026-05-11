@@ -288,60 +288,60 @@ echo ""
 echo "--- Command Compression Guidance ---"
 
 # Test 18: save-session.md has compression style section
-if grep -q "Compression Style" "$SRC_DIR/commands/save-session.md" && \
-   grep -q "telegraphic" "$SRC_DIR/commands/save-session.md"; then
+if grep -q "Compression Style" "$SRC_DIR/skills/save-session/SKILL.md" && \
+   grep -q "telegraphic" "$SRC_DIR/skills/save-session/SKILL.md"; then
     pass "save-session.md includes telegraphic compression guidance"
 else
     fail "save-session.md includes telegraphic compression guidance"
 fi
 
 # Test 19: save-session.md has before/after compression example
-if grep -q "before" "$SRC_DIR/commands/save-session.md" && \
-   grep -q "after" "$SRC_DIR/commands/save-session.md"; then
+if grep -q "before" "$SRC_DIR/skills/save-session/SKILL.md" && \
+   grep -q "after" "$SRC_DIR/skills/save-session/SKILL.md"; then
     pass "save-session.md includes compression before/after examples"
 else
     fail "save-session.md includes compression before/after examples"
 fi
 
 # Test 20: compact-memory.md has compression style section
-if grep -q "Compression Style" "$SRC_DIR/commands/compact-memory.md" && \
-   grep -q "telegraphic" "$SRC_DIR/commands/compact-memory.md"; then
+if grep -q "Compression Style" "$SRC_DIR/skills/compact-memory/SKILL.md" && \
+   grep -q "telegraphic" "$SRC_DIR/skills/compact-memory/SKILL.md"; then
     pass "compact-memory.md includes telegraphic compression guidance"
 else
     fail "compact-memory.md includes telegraphic compression guidance"
 fi
 
 # Test 21: compact-memory.md has relevance scoring
-if grep -q "Relevance Scoring" "$SRC_DIR/commands/compact-memory.md"; then
+if grep -q "Relevance Scoring" "$SRC_DIR/skills/compact-memory/SKILL.md"; then
     pass "compact-memory.md includes relevance scoring guidance"
 else
     fail "compact-memory.md includes relevance scoring guidance"
 fi
 
 # Test 22: compact-memory.md has deduplication rules
-if grep -q "Deduplication Rules" "$SRC_DIR/commands/compact-memory.md"; then
+if grep -q "Deduplication Rules" "$SRC_DIR/skills/compact-memory/SKILL.md"; then
     pass "compact-memory.md includes deduplication rules"
 else
     fail "compact-memory.md includes deduplication rules"
 fi
 
 # Test 23: resume.md mentions progressive disclosure
-if grep -q "progressive disclosure" "$SRC_DIR/commands/resume.md"; then
+if grep -q "progressive disclosure" "$SRC_DIR/skills/resume/SKILL.md"; then
     pass "resume.md explains progressive disclosure context"
 else
     fail "resume.md explains progressive disclosure context"
 fi
 
 # Test 24: cl-inject.md supports --full flag
-if grep -q "\-\-full" "$SRC_DIR/commands/cl-inject.md"; then
+if grep -q "\-\-full" "$SRC_DIR/skills/cl-inject/SKILL.md"; then
     pass "cl-inject.md documents --full flag"
 else
     fail "cl-inject.md documents --full flag"
 fi
 
 # Test 25: new-life.md uses progressive injection
-if grep -q "progressive" "$SRC_DIR/commands/new-life.md" && \
-   grep -q "telegraphic" "$SRC_DIR/commands/new-life.md"; then
+if grep -q "progressive" "$SRC_DIR/skills/new-life/SKILL.md" && \
+   grep -q "telegraphic" "$SRC_DIR/skills/new-life/SKILL.md"; then
     pass "new-life.md uses progressive injection and telegraphic style"
 else
     fail "new-life.md uses progressive injection and telegraphic style"

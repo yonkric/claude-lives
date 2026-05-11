@@ -25,66 +25,66 @@ trap 'rm -rf "$TMPDIR"' EXIT
 echo "=== /search Command Tests ==="
 
 # Test 1: search.md exists with frontmatter
-if head -1 "$SRC_DIR/commands/search.md" | grep -q '^\-\-\-'; then
+if head -1 "$SRC_DIR/skills/search/SKILL.md" | grep -q '^\-\-\-'; then
     pass "search.md exists with frontmatter"
 else
     fail "search.md exists with frontmatter"
 fi
 
 # Test 2: search supports --all flag
-if grep -q '\-\-all' "$SRC_DIR/commands/search.md"; then
+if grep -q '\-\-all' "$SRC_DIR/skills/search/SKILL.md"; then
     pass "search.md supports --all flag for cross-life search"
 else
     fail "search.md supports --all flag for cross-life search"
 fi
 
 # Test 3: search supports --sessions-only flag
-if grep -q '\-\-sessions-only' "$SRC_DIR/commands/search.md"; then
+if grep -q '\-\-sessions-only' "$SRC_DIR/skills/search/SKILL.md"; then
     pass "search.md supports --sessions-only filter"
 else
     fail "search.md supports --sessions-only filter"
 fi
 
 # Test 4: search supports --memory-only flag
-if grep -q '\-\-memory-only' "$SRC_DIR/commands/search.md"; then
+if grep -q '\-\-memory-only' "$SRC_DIR/skills/search/SKILL.md"; then
     pass "search.md supports --memory-only filter"
 else
     fail "search.md supports --memory-only filter"
 fi
 
 # Test 5: search uses grep/rg
-if grep -q 'grep\|rg' "$SRC_DIR/commands/search.md"; then
+if grep -q 'grep\|rg' "$SRC_DIR/skills/search/SKILL.md"; then
     pass "search.md uses grep or rg for searching"
 else
     fail "search.md uses grep or rg for searching"
 fi
 
 # Test 6: search covers sessions, memory, handover, and archive
-if grep -q 'sessions' "$SRC_DIR/commands/search.md" && \
-   grep -q 'memory.md' "$SRC_DIR/commands/search.md" && \
-   grep -q 'handover.md' "$SRC_DIR/commands/search.md" && \
-   grep -q 'archive' "$SRC_DIR/commands/search.md"; then
+if grep -q 'sessions' "$SRC_DIR/skills/search/SKILL.md" && \
+   grep -q 'memory.md' "$SRC_DIR/skills/search/SKILL.md" && \
+   grep -q 'handover.md' "$SRC_DIR/skills/search/SKILL.md" && \
+   grep -q 'archive' "$SRC_DIR/skills/search/SKILL.md"; then
     pass "search.md covers sessions, memory, handover, and archive"
 else
     fail "search.md covers sessions, memory, handover, and archive"
 fi
 
 # Test 7: search handles no-results case
-if grep -q 'No results' "$SRC_DIR/commands/search.md"; then
+if grep -q 'No results' "$SRC_DIR/skills/search/SKILL.md"; then
     pass "search.md handles no-results case"
 else
     fail "search.md handles no-results case"
 fi
 
 # Test 8: search is case-insensitive by default
-if grep -qi 'case-insensitive\|-i' "$SRC_DIR/commands/search.md"; then
+if grep -qi 'case-insensitive\|-i' "$SRC_DIR/skills/search/SKILL.md"; then
     pass "search.md defaults to case-insensitive"
 else
     fail "search.md defaults to case-insensitive"
 fi
 
 # Test 9: search handles workspace projects
-if grep -q 'workspace\|project' "$SRC_DIR/commands/search.md"; then
+if grep -q 'workspace\|project' "$SRC_DIR/skills/search/SKILL.md"; then
     pass "search.md handles workspace project scope"
 else
     fail "search.md handles workspace project scope"
@@ -95,63 +95,63 @@ echo ""
 echo "=== /timeline Command Tests ==="
 
 # Test 10: timeline.md exists with frontmatter
-if head -1 "$SRC_DIR/commands/timeline.md" | grep -q '^\-\-\-'; then
+if head -1 "$SRC_DIR/skills/timeline/SKILL.md" | grep -q '^\-\-\-'; then
     pass "timeline.md exists with frontmatter"
 else
     fail "timeline.md exists with frontmatter"
 fi
 
 # Test 11: timeline supports --weeks flag
-if grep -q '\-\-weeks' "$SRC_DIR/commands/timeline.md"; then
+if grep -q '\-\-weeks' "$SRC_DIR/skills/timeline/SKILL.md"; then
     pass "timeline.md supports --weeks filter"
 else
     fail "timeline.md supports --weeks filter"
 fi
 
 # Test 12: timeline supports brief format
-if grep -q '\-\-format brief\|brief' "$SRC_DIR/commands/timeline.md"; then
+if grep -q '\-\-format brief\|brief' "$SRC_DIR/skills/timeline/SKILL.md"; then
     pass "timeline.md supports brief format"
 else
     fail "timeline.md supports brief format"
 fi
 
 # Test 13: timeline reads session logs
-if grep -q 'sessions/' "$SRC_DIR/commands/timeline.md"; then
+if grep -q 'sessions/' "$SRC_DIR/skills/timeline/SKILL.md"; then
     pass "timeline.md reads session logs"
 else
     fail "timeline.md reads session logs"
 fi
 
 # Test 14: timeline reads archive
-if grep -q 'archive' "$SRC_DIR/commands/timeline.md"; then
+if grep -q 'archive' "$SRC_DIR/skills/timeline/SKILL.md"; then
     pass "timeline.md reads archived sessions"
 else
     fail "timeline.md reads archived sessions"
 fi
 
 # Test 15: timeline includes Key Milestones section
-if grep -q 'Key Milestones\|Milestones\|milestone' "$SRC_DIR/commands/timeline.md"; then
+if grep -q 'Key Milestones\|Milestones\|milestone' "$SRC_DIR/skills/timeline/SKILL.md"; then
     pass "timeline.md includes milestones synthesis"
 else
     fail "timeline.md includes milestones synthesis"
 fi
 
 # Test 16: timeline includes Major Decisions section
-if grep -q 'Major Decisions\|decision' "$SRC_DIR/commands/timeline.md"; then
+if grep -q 'Major Decisions\|decision' "$SRC_DIR/skills/timeline/SKILL.md"; then
     pass "timeline.md includes decisions synthesis"
 else
     fail "timeline.md includes decisions synthesis"
 fi
 
 # Test 17: timeline groups by week
-if grep -q 'Week of\|week' "$SRC_DIR/commands/timeline.md"; then
+if grep -q 'Week of\|week' "$SRC_DIR/skills/timeline/SKILL.md"; then
     pass "timeline.md groups by week"
 else
     fail "timeline.md groups by week"
 fi
 
 # Test 18: timeline handles workspace projects
-if grep -q 'workspace\|Workspace\|project' "$SRC_DIR/commands/timeline.md"; then
+if grep -q 'workspace\|Workspace\|project' "$SRC_DIR/skills/timeline/SKILL.md"; then
     pass "timeline.md handles workspace projects"
 else
     fail "timeline.md handles workspace projects"
@@ -190,21 +190,21 @@ else
 fi
 
 # Test 23: memory-status shows token economics
-if grep -q 'Token Economics' "$SRC_DIR/commands/memory-status.md"; then
+if grep -q 'Token Economics' "$SRC_DIR/skills/memory-status/SKILL.md"; then
     pass "memory-status.md shows Token Economics section"
 else
     fail "memory-status.md shows Token Economics section"
 fi
 
 # Test 24: memory-status references session_tokens from meta
-if grep -q 'session_tokens' "$SRC_DIR/commands/memory-status.md"; then
+if grep -q 'session_tokens' "$SRC_DIR/skills/memory-status/SKILL.md"; then
     pass "memory-status.md references session_tokens from meta"
 else
     fail "memory-status.md references session_tokens from meta"
 fi
 
 # Test 25: memory-status shows memory efficiency
-if grep -q 'efficiency\|recovered' "$SRC_DIR/commands/memory-status.md"; then
+if grep -q 'efficiency\|recovered' "$SRC_DIR/skills/memory-status/SKILL.md"; then
     pass "memory-status.md shows memory efficiency/recovered tokens"
 else
     fail "memory-status.md shows memory efficiency/recovered tokens"
@@ -229,35 +229,35 @@ echo ""
 echo "=== /fresh Command Tests ==="
 
 # Test 27: fresh.md exists with frontmatter
-if head -1 "$SRC_DIR/commands/fresh.md" | grep -q '^\-\-\-'; then
+if head -1 "$SRC_DIR/skills/fresh/SKILL.md" | grep -q '^\-\-\-'; then
     pass "fresh.md exists with frontmatter"
 else
     fail "fresh.md exists with frontmatter"
 fi
 
 # Test 28: fresh references save-session workflow
-if grep -q 'save-session\|session summary\|handover\|memory' "$SRC_DIR/commands/fresh.md"; then
+if grep -q 'save-session\|session summary\|handover\|memory' "$SRC_DIR/skills/fresh/SKILL.md"; then
     pass "fresh.md references save-session workflow"
 else
     fail "fresh.md references save-session workflow"
 fi
 
 # Test 29: fresh instructs user to /clear
-if grep -q '/clear' "$SRC_DIR/commands/fresh.md"; then
+if grep -q '/clear' "$SRC_DIR/skills/fresh/SKILL.md"; then
     pass "fresh.md instructs user to run /clear"
 else
     fail "fresh.md instructs user to run /clear"
 fi
 
 # Test 30: fresh writes .last-saved marker
-if grep -q '.last-saved' "$SRC_DIR/commands/fresh.md"; then
+if grep -q '.last-saved' "$SRC_DIR/skills/fresh/SKILL.md"; then
     pass "fresh.md includes .last-saved marker step"
 else
     fail "fresh.md includes .last-saved marker step"
 fi
 
 # Test 31: fresh explains why not just /clear
-if grep -q 'built-in\|intercept\|cannot' "$SRC_DIR/commands/fresh.md"; then
+if grep -q 'built-in\|intercept\|cannot' "$SRC_DIR/skills/fresh/SKILL.md"; then
     pass "fresh.md explains why /clear can't be intercepted"
 else
     fail "fresh.md explains why /clear can't be intercepted"

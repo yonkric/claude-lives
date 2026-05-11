@@ -213,14 +213,14 @@ echo ""
 echo "=== UX: Auto-Compact ==="
 
 # Test 22: save-session auto-compacts instead of just warning
-if grep -q 'automatically run.*compact-memory\|auto.*compact' "$SRC_DIR/commands/save-session.md"; then
+if grep -q 'automatically run.*compact-memory\|auto.*compact' "$SRC_DIR/skills/save-session/SKILL.md"; then
     pass "save-session auto-compacts when over 80% budget"
 else
     fail "save-session should auto-compact instead of just warning"
 fi
 
 # Test 23: save-session mentions auto-compact in confirmation
-if grep -q 'Auto-compacted' "$SRC_DIR/commands/save-session.md"; then
+if grep -q 'Auto-compacted' "$SRC_DIR/skills/save-session/SKILL.md"; then
     pass "save-session confirmation mentions auto-compact"
 else
     fail "save-session should mention auto-compact in confirmation"
@@ -231,28 +231,28 @@ echo ""
 echo "=== UX: Simplified /new-life ==="
 
 # Test 24: new-life has auto-detection
-if grep -q 'Auto-detect' "$SRC_DIR/commands/new-life.md"; then
+if grep -q 'Auto-detect' "$SRC_DIR/skills/new-life/SKILL.md"; then
     pass "new-life includes auto-detection"
 else
     fail "new-life should auto-detect name, stack, type"
 fi
 
 # Test 25: new-life asks only 2 questions
-if grep -q 'Ask only 2 questions' "$SRC_DIR/commands/new-life.md"; then
+if grep -q 'Ask only 2 questions' "$SRC_DIR/skills/new-life/SKILL.md"; then
     pass "new-life reduced to 2 questions"
 else
     fail "new-life should ask only 2 questions"
 fi
 
 # Test 26: new-life scans for project markers
-if grep -q 'package.json\|pyproject.toml\|go.mod\|Cargo.toml' "$SRC_DIR/commands/new-life.md"; then
+if grep -q 'package.json\|pyproject.toml\|go.mod\|Cargo.toml' "$SRC_DIR/skills/new-life/SKILL.md"; then
     pass "new-life scans for project file markers"
 else
     fail "new-life should scan for package.json, pyproject.toml, etc."
 fi
 
 # Test 27: new-life derives name from directory
-if grep -q 'directory basename\|dirname' "$SRC_DIR/commands/new-life.md"; then
+if grep -q 'directory basename\|dirname' "$SRC_DIR/skills/new-life/SKILL.md"; then
     pass "new-life derives name from directory basename"
 else
     fail "new-life should derive name from directory basename"
@@ -263,11 +263,11 @@ echo ""
 echo "=== UX: Stale Session Message ==="
 
 # Test 28: resume does NOT suggest /save-session for recovery
-if grep -q 'Do NOT suggest.*save-session\|do not.*save-session' "$SRC_DIR/commands/resume.md"; then
+if grep -q 'Do NOT suggest.*save-session\|do not.*save-session' "$SRC_DIR/skills/resume/SKILL.md"; then
     pass "resume does not suggest /save-session when context is gone"
 else
     # Check the alternative phrasing
-    if grep -q 'no longer in the conversation' "$SRC_DIR/commands/resume.md"; then
+    if grep -q 'no longer in the conversation' "$SRC_DIR/skills/resume/SKILL.md"; then
         pass "resume explains context is gone (no misleading recovery suggestion)"
     else
         fail "resume should not suggest /save-session for recovery"
@@ -275,7 +275,7 @@ else
 fi
 
 # Test 29: resume suggests git log for reconstruction
-if grep -q 'git log\|recent file changes' "$SRC_DIR/commands/resume.md"; then
+if grep -q 'git log\|recent file changes' "$SRC_DIR/skills/resume/SKILL.md"; then
     pass "resume suggests git log for reconstruction"
 else
     fail "resume should suggest git log or recent file changes"

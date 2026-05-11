@@ -2,14 +2,14 @@
 set -euo pipefail
 
 # claude-lives uninstaller
-# Removes hooks and commands. Memory data is preserved by default.
+# Removes hooks and skills. Memory data is preserved by default.
 #
 # Usage: ./uninstall.sh [--delete-data]
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 LIVES_DIR="$HOME/.claude-lives"
 CLAUDE_DIR="$HOME/.claude"
-COMMANDS_DIR="$CLAUDE_DIR/commands"
+SKILLS_DIR="$CLAUDE_DIR/skills"
 SETTINGS_FILE="$CLAUDE_DIR/settings.json"
 
 DELETE_DATA=false
@@ -23,14 +23,20 @@ warn() { echo "  [!] $1"; }
 echo "=== claude-lives uninstaller ==="
 echo ""
 
-# Remove slash commands
-echo "Step 1: Removing slash commands"
-commands=("new-life" "save-session" "resume" "memory-status" "borrow" "compact-memory" "sync" "cl-inject" "import-claude-mem" "fresh" "search" "timeline" "checkpoint")
-for cmd in "${commands[@]}"; do
-    dest="$COMMANDS_DIR/${cmd}.md"
-    if [[ -f "$dest" ]]; then
-        rm "$dest"
-        info "Removed /$cmd"
+# Remove skills
+echo "Step 1: Removing skills"
+skills=("new-life" "save-session" "resume" "memory-status" "borrow" "compact-memory" "sync" "cl-inject" "import-claude-mem" "fresh" "search" "timeline" "checkpoint")
+for skill in "${skills[@]}"; do
+    dest_dir="$SKILLS_DIR/${skill}"
+    if [[ -d "$dest_dir" ]]; then
+        rm -rf "$dest_dir"
+        info "Removed /$skill"
+    fi
+    # Also clean up legacy commands/ from older installs
+    legacy="$CLAUDE_DIR/commands/${skill}.md"
+    if [[ -f "$legacy" ]]; then
+        rm -f "$legacy"
+        info "Removed legacy command /$skill"
     fi
 done
 echo ""

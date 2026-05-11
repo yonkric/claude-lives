@@ -1,6 +1,6 @@
 {
   "name": "claude-lives",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Memory isolation for Claude Code. Separate work, research, and side projects into fully isolated lives.",
   "author": {
     "name": "yonkric",
@@ -16,6 +16,5 @@
     "productivity",
     "session"
   ],
-  "commands": ["./commands/"],
-  "agents": []
+  "skills": ["./skills/"]
 }
