@@ -60,9 +60,35 @@ This is the default. Detect the current working directory and try to match it to
 
    Convert to valid life name: lowercase, spaces to hyphens. Only alphanumeric, hyphens, and underscores allowed.
 
+### Workspace-aware mode (run from a workspace or directory with child project folders)
+
+If the current directory has a `.claude-life` with `type: workspace`, OR has multiple child directories containing project markers (`.git`, `package.json`, etc.), use workspace-aware import:
+
+1. **Scan child directories**: list immediate subdirectories that look like projects
+2. **Match against claude-mem projects**: for each child directory, try to find a matching claude-mem project by name (case-insensitive, fuzzy — e.g., child dir `my-research` matches claude-mem project `MY-RESEARCH` or `my_research`)
+3. **Present the mapping** in a table:
+   ```
+   Proposed import mapping:
+   
+   | Directory        | claude-mem Project | Observations | Summaries |
+   |------------------|--------------------|-------------|-----------|
+   | ./claude-lives/  | claude-lives       | 50          | 8         |
+   | ./my-research/   | PHD                | 150         | 20        |
+   | ./work-tool/     | (no match)         | —           | —         |
+   ```
+4. **Ask for confirmation** using AskUserQuestion:
+   - **"Import these matched projects into the workspace?"** (header: "Import")
+     - "Yes, import all matched (Recommended)" (description: "Imports {N} matched projects, skips unmatched directories")
+     - "Let me adjust the mapping" (description: "Review and change matches before importing")
+     - "Import all claude-mem projects" (description: "Import everything, including projects without matching directories")
+     - multiSelect: false
+
+5. For matched projects, import directly into the workspace project structure at `~/.claude-lives/{workspace}/projects/{dir-name}/`
+6. For unmatched claude-mem projects, ask where to put them or skip
+
 ### Bulk mode (`--all` flag)
 
-Import all projects. Show the proposed mapping, then use **AskUserQuestion**:
+Import all projects regardless of directory structure. Show the proposed mapping, then use **AskUserQuestion**:
 
 - **"Which projects should be imported?"** (header: "Import")
   - Options: "All projects", "Let me pick specific ones", "Show me the list first"

@@ -2,6 +2,26 @@
 
 All notable changes to claude-lives are documented here.
 
+## [0.2.1] — 2026-05-11
+
+### UX Edge Case Fixes
+
+**Problem:** Real-world usage revealed UX gaps when users have existing `.claude-life` markers in child directories, when importing claude-mem into workspace lives, and when parsing JSON in the stop hook.
+
+**Fixes:**
+- `/new-life` now runs pre-flight checks (Step 0) before the interview:
+  - Detects existing `.claude-life` in current directory (stops with guidance)
+  - Detects parent `.claude-life` above (warns user, lets them decide)
+  - Detects child `.claude-life` below (offers to absorb into workspace)
+  - Absorption moves memory data from child life stores into workspace project structure, removes child markers, cleans old CLAUDE.md injections
+- `/new-life` adds `.claude-life` to `.gitignore` when in a git repo (Step 2a-bis)
+- `/import-claude-mem` now has workspace-aware mode:
+  - Scans child directories for project markers (`.git`, `package.json`, etc.)
+  - Matches child dirs against claude-mem projects by name (case-insensitive, fuzzy)
+  - Presents mapping table for confirmation before importing
+  - Imports matched projects directly into workspace project structure at `~/.claude-lives/{workspace}/projects/{dir-name}/`
+- `stop_hook.sh` JSON parsing replaced: bash `grep`/`sed` → Node.js `node -e` (more reliable, Node.js guaranteed by Claude Code)
+
 ## [0.2.0] — 2026-05-11
 
 ### Plugin Architecture Fixes
@@ -11,7 +31,7 @@ All notable changes to claude-lives are documented here.
 **Problem:** Core functionality (stop hook, installer, uninstaller) required Python 3.8+ for JSON parsing and hook registration. This contradicted the "no Python for core features" philosophy and added an unnecessary dependency.
 
 **Fixes:**
-- Added `"hooks": "./hooks/"` to `plugin.json` — marketplace installs now get both hooks automatically
+- Added `"hooks": "./hooks/hooks.json"` to `plugin.json` — marketplace installs now get both hooks automatically
 - Replaced Python JSON parsing in `stop_hook.sh` with pure bash (`grep`/`sed`)
 - Replaced Python JSON manipulation in `install.sh` and `uninstall.sh` with Node.js (guaranteed available — Claude Code requires it)
 - Fixed heredoc date expansion bug in `install.sh` (was using single-quoted heredoc then patching with `sed`)

@@ -49,10 +49,13 @@ fi
 timestamp=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
 echo "$timestamp" > "$target_dir/.last-session"
 
-# Extract transcript_path from stdin JSON (pure bash — no python3 needed)
+# Extract transcript_path from stdin JSON via node (guaranteed by Claude Code)
 transcript_path=""
-if [[ -n "$input" ]]; then
-    transcript_path=$(echo "$input" | grep -o '"transcript_path"[[:space:]]*:[[:space:]]*"[^"]*"' | head -1 | sed 's/.*"transcript_path"[[:space:]]*:[[:space:]]*"//;s/"$//') || true
+if [[ -n "$input" ]] && command -v node &>/dev/null; then
+    transcript_path=$(echo "$input" | node -e "
+let d='';process.stdin.on('data',c=>d+=c);process.stdin.on('end',()=>{
+try{process.stdout.write(JSON.parse(d).transcript_path||'')}catch(e){}
+});" 2>/dev/null) || true
 fi
 
 # Parse transcript for session metadata
