@@ -45,7 +45,9 @@ cd claude-lives
 ./install.sh
 ```
 
-All methods install 13 slash commands, two hooks (Stop + PostToolUse), and create the `~/.claude-lives/` memory store. Run `./uninstall.sh` to remove (your memory data is preserved unless you pass `--delete-data`).
+All methods install 13 slash commands and two hooks (Stop + PostToolUse). The npx and manual methods also create the `~/.claude-lives/` memory store upfront; the plugin method creates it when you first run `/new-life`. Run `./uninstall.sh` to remove (your memory data is preserved unless you pass `--delete-data`).
+
+**Upgrading?** Just re-run the same install command. Skills and hooks are replaced with the latest version; your memory data at `~/.claude-lives/` is never touched.
 
 ## Getting Started
 
@@ -268,7 +270,6 @@ This commits and pushes your memory store. On another machine, clone the repo to
 
 | Version | Focus | Key Changes |
 |---------|-------|-------------|
-| **v0.2** | Invisible mode | Auto-compact on budget warning, better stale detection messages |
 | **v0.3** | Power features | Session tagging, /forget, /list-lives dashboard, /sync conflict handling |
 | **v1.0** | Team support | Gitignored injection target, CLAUDE_LIVES_READONLY mode, team-memory.md layer, /share command |
 
@@ -308,10 +309,10 @@ Running multiple memory systems simultaneously causes conflicts — duplicate co
 
 ## Requirements
 
-- Claude Code
-- bash
-- Python 3.8+ (for hook registration and migration)
+- Claude Code (Node.js is used internally for hook registration)
+- bash (4.0+)
 - git (for /sync)
+- Python 3.8+ (optional — only needed for `/import-claude-mem` migration from claude-mem)
 
 ## License
 

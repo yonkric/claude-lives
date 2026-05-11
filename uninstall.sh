@@ -6,7 +6,6 @@ set -euo pipefail
 #
 # Usage: ./uninstall.sh [--delete-data]
 
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 LIVES_DIR="$HOME/.claude-lives"
 CLAUDE_DIR="$HOME/.claude"
 SKILLS_DIR="$CLAUDE_DIR/skills"
@@ -44,36 +43,29 @@ echo ""
 # Remove hooks from settings.json
 echo "Step 2: Removing hooks from settings.json"
 if [[ -f "$SETTINGS_FILE" ]]; then
-    if command -v python3 &>/dev/null; then
-        CL_SETTINGS_PATH="$SETTINGS_FILE" python3 -c "
-import json, os
-settings_path = os.environ['CL_SETTINGS_PATH']
-with open(settings_path) as f:
-    s = json.load(f)
+    if command -v node &>/dev/null; then
+        CL_SETTINGS_PATH="$SETTINGS_FILE" node -e "
+const fs = require('fs');
+const settingsPath = process.env.CL_SETTINGS_PATH;
+const settings = JSON.parse(fs.readFileSync(settingsPath, 'utf8'));
 
-def remove_hook(settings, event_type, script_name):
-    if 'hooks' not in settings or event_type not in settings['hooks']:
-        return False
-    before = len(settings['hooks'][event_type])
-    settings['hooks'][event_type] = [
-        e for e in settings['hooks'][event_type]
-        if not any(script_name in h.get('command','') for h in e.get('hooks',[]))
-    ]
-    if not settings['hooks'][event_type]:
-        del settings['hooks'][event_type]
-    return len(settings['hooks'].get(event_type, [])) < before
+function removeHook(eventType, scriptName) {
+    if (!settings.hooks || !settings.hooks[eventType]) return false;
+    const before = settings.hooks[eventType].length;
+    settings.hooks[eventType] = settings.hooks[eventType].filter(e =>
+        !e.hooks?.some(h => (h.command || '').includes(scriptName))
+    );
+    if (settings.hooks[eventType].length === 0) delete settings.hooks[eventType];
+    return (settings.hooks[eventType]?.length || 0) < before;
+}
 
-removed_stop = remove_hook(s, 'Stop', 'stop_hook.sh')
-removed_post = remove_hook(s, 'PostToolUse', 'post_tool_hook.sh')
+removeHook('Stop', 'stop_hook.sh');
+removeHook('PostToolUse', 'post_tool_hook.sh');
 
-with open(settings_path,'w') as f:
-    json.dump(s, f, indent=4)
+if (settings.hooks && Object.keys(settings.hooks).length === 0) delete settings.hooks;
 
-if removed_stop:
-    print('stop')
-if removed_post:
-    print('post')
-"
+fs.writeFileSync(settingsPath, JSON.stringify(settings, null, 4));
+" 2>/dev/null
         result=$?
         if [[ $result -eq 0 ]]; then
             grep -qF "stop_hook.sh" "$SETTINGS_FILE" 2>/dev/null || info "Removed Stop hook"
@@ -82,7 +74,7 @@ if removed_post:
             warn "Could not remove hooks — remove manually from $SETTINGS_FILE"
         fi
     else
-        warn "python3 not found — remove hooks manually from $SETTINGS_FILE"
+        warn "node not found — remove hooks manually from $SETTINGS_FILE"
     fi
 else
     info "No settings.json found"

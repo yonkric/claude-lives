@@ -148,25 +148,25 @@ fi
 echo ""
 echo "=== Security: Installer Fixes ==="
 
-# Test 14: Installer uses env vars for Python, not string interpolation
-if grep -q "os.environ\['CL_SETTINGS_PATH'\]" "$SRC_DIR/install.sh"; then
+# Test 14: Installer uses env vars for Node, not string interpolation
+if grep -q "process.env.CL_SETTINGS_PATH" "$SRC_DIR/install.sh"; then
     pass "Installer passes settings path via env var"
 else
-    fail "Installer should use os.environ, not string interpolation"
+    fail "Installer should use process.env, not string interpolation"
 fi
 
 # Test 15: Installer passes hook commands via env var
-if grep -q "os.environ\['CL_STOP_HOOK'\]" "$SRC_DIR/install.sh" && grep -q "os.environ\['CL_POST_TOOL_HOOK'\]" "$SRC_DIR/install.sh"; then
+if grep -q "process.env.CL_STOP_HOOK" "$SRC_DIR/install.sh" && grep -q "process.env.CL_POST_TOOL_HOOK" "$SRC_DIR/install.sh"; then
     pass "Installer passes hook commands via env var"
 else
-    fail "Installer should pass hook commands via os.environ"
+    fail "Installer should pass hook commands via process.env"
 fi
 
-# Test 16: Uninstaller uses env vars for Python
-if grep -q "os.environ\['CL_SETTINGS_PATH'\]" "$SRC_DIR/uninstall.sh"; then
+# Test 16: Uninstaller uses env vars for Node
+if grep -q "process.env.CL_SETTINGS_PATH" "$SRC_DIR/uninstall.sh"; then
     pass "Uninstaller passes settings path via env var"
 else
-    fail "Uninstaller should use os.environ, not string interpolation"
+    fail "Uninstaller should use process.env, not string interpolation"
 fi
 
 # Test 17: Installer creates memory store with 700 permissions

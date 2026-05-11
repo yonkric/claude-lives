@@ -21,8 +21,9 @@ docs/            — Design docs, plan, test reports
 - Slash commands are the primary interface — Claude does the intelligence work
 - Token counting is approximate (4 chars ≈ 1 token) — soft budget
 - PostToolUse hook counts tool calls; CLAUDE.md instruction triggers mid-session snapshots to disk every ~20 calls to preserve context across auto-compaction
-- No MCP server, no external services, no Python for core features
-- Hooks are installed to `~/.claude/claude-lives-lib/hooks/` so they work after npx cleanup
+- No MCP server, no external services, no Python for core features (Python only for optional claude-mem migration)
+- Hooks work via two paths: plugin `hooks/hooks.json` (marketplace installs) and `~/.claude/claude-lives-lib/hooks/` (npx installs)
+- JSON manipulation uses Node.js (guaranteed by Claude Code) instead of Python
 
 ## Development Commands
 
@@ -48,11 +49,11 @@ bash lib/token_count.sh <file>
 ## Life: claude-lives
 
 **Identity:** Claude Code plugin for life-context isolation. Pure markdown + bash + slash commands. Published at github.com/yonkric/claude-lives.
-**Focus:** v0.1.0 released and pushed to GitHub. Next: npm publish for npx support, then claude-code native memory backend.
+**Focus:** v0.2.0 ready to publish. Plugin architecture fixed, python3 removed from core, upgrade support added.
 **Last session:** 2026-05-11
-**Was doing:** Completed v0.1.0 public release. Repo pushed to github.com/yonkric/claude-lives. All 329 tests passing. Hooks re-installed to correct paths.
+**Was doing:** Fixed plugin architecture (hooks in plugin.json, python3→node, upgrade detection). Migrated commands/→skills/. All 329 tests passing.
 **Next:** - npm publish to enable npx claude-lives (need npm login first)
-- Create GitHub release: gh release create v0.1.0
+- Create GitHub release: gh release create v0.2.0
 - Implement claude-code native memory backend (refactor commands to use ~/.claude/projects/<path>/memory/)
 
 ### Global

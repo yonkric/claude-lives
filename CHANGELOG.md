@@ -2,6 +2,42 @@
 
 All notable changes to claude-lives are documented here.
 
+## [0.2.0] — 2026-05-11
+
+### Plugin Architecture Fixes
+
+**Problem:** Plugin marketplace installs (`/plugin marketplace add`) only loaded skills but not hooks, because `plugin.json` didn't declare the hooks directory. Users on the marketplace path had no session tracking or auto-save metadata.
+
+**Problem:** Core functionality (stop hook, installer, uninstaller) required Python 3.8+ for JSON parsing and hook registration. This contradicted the "no Python for core features" philosophy and added an unnecessary dependency.
+
+**Fixes:**
+- Added `"hooks": "./hooks/"` to `plugin.json` — marketplace installs now get both hooks automatically
+- Replaced Python JSON parsing in `stop_hook.sh` with pure bash (`grep`/`sed`)
+- Replaced Python JSON manipulation in `install.sh` and `uninstall.sh` with Node.js (guaranteed available — Claude Code requires it)
+- Fixed heredoc date expansion bug in `install.sh` (was using single-quoted heredoc then patching with `sed`)
+- Python 3.8+ is now optional — only needed for `/import-claude-mem` migration
+
+**Upgrade support:**
+- Installer now detects previous version via `~/.claude/claude-lives-lib/.version` marker
+- Shows "Upgrading X → Y" messaging on re-install
+- Skills, hooks, and lib scripts are always replaced with latest
+- Memory data at `~/.claude-lives/` is never modified during upgrades
+
+**Other:**
+- `/import-claude-mem` now searches multiple locations for the migration script (npx path, plugin root)
+- Updated README requirements, roadmap, and upgrade instructions
+- Version bumped from 0.1.1 to 0.2.0 across plugin.json, marketplace.json, and package.json
+- Tests: 329/329 passing
+
+### Skills Migration (v0.1.1)
+
+Migrated from legacy `commands/` to modern `skills/` directory format.
+
+- All 13 slash commands moved from `commands/*.md` to `skills/*/SKILL.md`
+- Installer, uninstaller, plugin manifest, and all 11 test files updated
+- `plugin.json` now uses `"skills": ["./skills/"]` instead of `"commands"`
+- Installer cleans up legacy `~/.claude/commands/` entries from previous installs
+
 ## [0.1.0] — 2026-05-11
 
 ### Public Release

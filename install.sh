@@ -4,6 +4,9 @@ set -euo pipefail
 # claude-lives installer
 # Creates memory store, registers hooks, and installs slash commands.
 #
+# Safe for upgrades: replaces skills and hooks, never modifies existing memory data.
+# Can be run repeatedly — idempotent.
+#
 # Usage: ./install.sh [--hooks-only] [--dry-run]
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -12,6 +15,7 @@ CLAUDE_DIR="$HOME/.claude"
 SKILLS_DIR="$CLAUDE_DIR/skills"
 SETTINGS_FILE="$CLAUDE_DIR/settings.json"
 LIB_DEST="$CLAUDE_DIR/claude-lives-lib"
+VERSION="0.2.0"
 
 DRY_RUN=false
 HOOKS_ONLY=false
@@ -27,16 +31,18 @@ info() { echo "  [+] $1"; }
 warn() { echo "  [!] $1"; }
 skip() { echo "  [-] $1 (already exists)"; }
 
-echo "=== claude-lives installer ==="
-echo ""
-
-# ─── Dependency check ───
-
-if ! command -v python3 &>/dev/null; then
-    warn "python3 not found — required for hook registration and claude-mem migration"
-    warn "Install Python 3.8+ and try again"
-    exit 1
+# Detect upgrade
+PREV_VERSION=""
+if [[ -f "$LIB_DEST/.version" ]]; then
+    PREV_VERSION=$(cat "$LIB_DEST/.version" 2>/dev/null) || PREV_VERSION=""
 fi
+
+if [[ -n "$PREV_VERSION" ]]; then
+    echo "=== claude-lives installer (upgrading $PREV_VERSION → $VERSION) ==="
+else
+    echo "=== claude-lives installer ==="
+fi
+echo ""
 
 # ─── Step 1: Create memory store ───
 
@@ -50,9 +56,10 @@ if ! $HOOKS_ONLY; then
         chmod 700 "$LIVES_DIR"
 
         if [[ ! -f "$LIVES_DIR/global/memory.md" ]]; then
-            cat > "$LIVES_DIR/global/memory.md" <<'GLOBAL_MEM'
+            today=$(date +%Y-%m-%d)
+            cat > "$LIVES_DIR/global/memory.md" <<EOF
 ---
-last_updated: $(date +%Y-%m-%d)
+last_updated: $today
 ---
 
 # Global Preferences
@@ -67,11 +74,7 @@ These preferences apply across all lives.
 
 ## Formatting Preferences
 (Not yet configured)
-GLOBAL_MEM
-            # Fix the date (heredoc doesn't expand)
-            sed -i.bak "s/\$(date +%Y-%m-%d)/$(date +%Y-%m-%d)/" "$LIVES_DIR/global/memory.md" 2>/dev/null || \
-            sed -i '' "s/\$(date +%Y-%m-%d)/$(date +%Y-%m-%d)/" "$LIVES_DIR/global/memory.md"
-            rm -f "$LIVES_DIR/global/memory.md.bak"
+EOF
             info "Created global/memory.md"
         else
             skip "global/memory.md"
@@ -164,6 +167,7 @@ if ! $HOOKS_ONLY; then
     for skill in "${skills[@]}"; do
         if [[ -f "$OLD_COMMANDS_DIR/${skill}.md" ]]; then
             rm -f "$OLD_COMMANDS_DIR/${skill}.md"
+            info "Removed legacy command /${skill}"
         fi
     done
 
@@ -182,8 +186,6 @@ if [[ ! -f "$SETTINGS_FILE" ]]; then
     fi
 fi
 
-# Hooks point to the installed location, not the source tree.
-# This ensures hooks work after npx cleanup or if the source is moved.
 STOP_HOOK_COMMAND="bash \"$LIB_DEST/hooks/stop_hook.sh\""
 POST_TOOL_HOOK_COMMAND="bash \"$LIB_DEST/hooks/post_tool_hook.sh\""
 
@@ -191,60 +193,42 @@ if $DRY_RUN; then
     info "Would register Stop hook: $STOP_HOOK_COMMAND"
     info "Would register PostToolUse hook: $POST_TOOL_HOOK_COMMAND"
 else
+    # Use node (guaranteed available — Claude Code requires it) for JSON manipulation
     CL_SETTINGS_PATH="$SETTINGS_FILE" \
     CL_STOP_HOOK="$STOP_HOOK_COMMAND" \
     CL_POST_TOOL_HOOK="$POST_TOOL_HOOK_COMMAND" \
-    python3 -c "
-import json, os
+    node -e "
+const fs = require('fs');
+const settingsPath = process.env.CL_SETTINGS_PATH;
+const stopHook = process.env.CL_STOP_HOOK;
+const postToolHook = process.env.CL_POST_TOOL_HOOK;
 
-settings_path = os.environ['CL_SETTINGS_PATH']
-stop_hook = os.environ['CL_STOP_HOOK']
-post_tool_hook = os.environ['CL_POST_TOOL_HOOK']
+const settings = JSON.parse(fs.readFileSync(settingsPath, 'utf8'));
+if (!settings.hooks) settings.hooks = {};
 
-with open(settings_path) as f:
-    settings = json.load(f)
+function registerHook(eventType, hookCommand) {
+    if (!settings.hooks[eventType]) settings.hooks[eventType] = [];
 
-if 'hooks' not in settings:
-    settings['hooks'] = {}
+    // Remove any existing claude-lives hooks (handles upgrades with path changes)
+    settings.hooks[eventType] = settings.hooks[eventType].filter(e =>
+        !e.hooks?.some(h =>
+            (h.command || '').includes('claude-lives') ||
+            (h.command || '').includes('stop_hook.sh') ||
+            (h.command || '').includes('post_tool_hook.sh')
+        )
+    );
 
-def register_hook(settings, event_type, hook_command, matcher=''):
-    if event_type not in settings['hooks']:
-        settings['hooks'][event_type] = []
+    settings.hooks[eventType].push({
+        matcher: '',
+        hooks: [{ type: 'command', command: hookCommand }]
+    });
+}
 
-    already = any(
-        h.get('command', '') == hook_command
-        for entry in settings['hooks'][event_type]
-        for h in entry.get('hooks', [])
-    )
+registerHook('Stop', stopHook);
+registerHook('PostToolUse', postToolHook);
 
-    if not already:
-        # Remove any old claude-lives hooks (from previous installs with different paths)
-        settings['hooks'][event_type] = [
-            e for e in settings['hooks'][event_type]
-            if not any('claude-lives' in h.get('command','') or 'stop_hook.sh' in h.get('command','') or 'post_tool_hook.sh' in h.get('command','')
-                       for h in e.get('hooks',[]))
-        ]
-        settings['hooks'][event_type].append({
-            'matcher': matcher,
-            'hooks': [{
-                'type': 'command',
-                'command': hook_command
-            }]
-        })
-        return True
-    return False
-
-registered_stop = register_hook(settings, 'Stop', stop_hook)
-registered_post = register_hook(settings, 'PostToolUse', post_tool_hook)
-
-with open(settings_path, 'w') as f:
-    json.dump(settings, f, indent=4)
-
-if registered_stop:
-    print('stop')
-if registered_post:
-    print('post')
-"
+fs.writeFileSync(settingsPath, JSON.stringify(settings, null, 4));
+" 2>/dev/null
     result=$?
     if [[ $result -eq 0 ]]; then
         if grep -qF "stop_hook.sh" "$SETTINGS_FILE" 2>/dev/null; then
@@ -283,13 +267,23 @@ else
         cp "$SCRIPT_DIR/migration/claude_mem.py" "$LIB_DEST/claude_mem.py"
         info "Installed migration script"
     fi
+
+    # Write version marker for upgrade detection
+    echo "$VERSION" > "$LIB_DEST/.version"
 fi
 
 echo ""
 
 # ─── Done ───
 
-echo "=== Installation complete ==="
+if [[ -n "$PREV_VERSION" ]]; then
+    echo "=== Upgrade complete ($PREV_VERSION → $VERSION) ==="
+    echo ""
+    echo "Updated: skills, hooks, and library scripts"
+    echo "Preserved: all memory data at $LIVES_DIR"
+else
+    echo "=== Installation complete ==="
+fi
 echo ""
 echo "Quick start:"
 echo "  1. cd to a project directory"
@@ -303,9 +297,6 @@ echo "  5. Context is auto-loaded from CLAUDE.md — /resume for full details"
 echo ""
 echo "Coming from claude-mem?"
 echo "  Run /import-claude-mem in each project directory to import your data"
-echo "  Then disable claude-mem (see docs/disable-claude-mem.md)"
 echo ""
 echo "Commands: /new-life, /save-session, /resume, /fresh, /memory-status,"
 echo "          /compact-memory, /borrow, /sync, /import-claude-mem, /cl-inject (internal)"
-echo ""
-echo "Docs: README.md, docs/disable-claude-mem.md"

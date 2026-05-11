@@ -18,9 +18,10 @@ cd claude-lives
 ### Requirements
 
 - bash (4.0+)
-- Python 3.8+ (for hook registration and claude-mem migration)
+- Node.js (comes with Claude Code — used for hook registration)
 - git
 - Claude Code
+- Python 3.8+ (optional — only for claude-mem migration tests)
 
 ## Running Tests
 

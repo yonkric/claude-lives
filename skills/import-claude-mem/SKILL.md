@@ -84,15 +84,19 @@ If it does, use **AskUserQuestion** to warn and confirm:
 
 ## Step 4: Run the migration
 
-Run the migration script. The script is bundled at the install location:
+Run the migration script. Search for it in order:
+
+1. `~/.claude/claude-lives-lib/claude_mem.py` (npx install location)
+2. The plugin directory: look for a `migration/claude_mem.py` relative to any installed claude-lives plugin
+3. Ask the user where they cloned/downloaded claude-lives
 
 ```bash
+# Try the npx install location first
 python3 ~/.claude/claude-lives-lib/claude_mem.py --db ~/.claude-mem/claude-mem.db --output ~/.claude-lives
-```
 
-If the migration script is not found at `~/.claude/claude-lives-lib/claude_mem.py`, look for it at these alternatives:
-1. `~/.claude/claude-lives-lib/../src/migration/claude_mem.py`
-2. Ask the user where they cloned/downloaded claude-lives
+# Or from plugin root (if installed via marketplace)
+python3 <plugin_root>/migration/claude_mem.py --db ~/.claude-mem/claude-mem.db --output ~/.claude-lives
+```
 
 After running, verify that each life directory was created with the expected files:
 - `~/.claude-lives/{life_name}/memory.md`
