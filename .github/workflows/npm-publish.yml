@@ -7,8 +7,10 @@ on:
 jobs:
   publish:
     runs-on: ubuntu-latest
+    environment: npm
     permissions:
       contents: read
+      id-token: write
     steps:
       - uses: actions/checkout@v4
 
@@ -17,6 +19,4 @@ jobs:
           node-version: 20
           registry-url: https://registry.npmjs.org
 
-      - run: npm publish
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+      - run: npm publish --provenance --access public
