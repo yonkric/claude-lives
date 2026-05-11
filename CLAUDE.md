@@ -49,11 +49,10 @@ bash lib/token_count.sh <file>
 ## Life: claude-lives
 
 **Identity:** Claude Code plugin for life-context isolation. Pure markdown + bash + slash commands. Published at github.com/yonkric/claude-lives.
-**Focus:** v0.2.0 published. UX edge cases patched in v0.2.1.
+**Focus:** v0.2.1 committed and pushed. Ready for npm publish + gh release.
 **Last session:** 2026-05-11
-**Was doing:** Patched UX edge cases: /new-life pre-flight checks (child life absorption), /import-claude-mem workspace-aware mode, stop hook node JSON parsing. CHANGELOG updated.
-**Next:** - Commit and push v0.2.1 patch
-- npm publish v0.2.1
+**Was doing:** Updated CHANGELOG with v0.2.1 entry, bumped version in all manifests, committed and pushed. 329/329 tests passing.
+**Next:** - npm publish v0.2.1
 - Create GitHub release for v0.2.1
 - Implement claude-code native memory backend (refactor commands to use ~/.claude/projects/<path>/memory/)
 

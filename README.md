@@ -51,16 +51,43 @@ All methods install 13 slash commands and two hooks (Stop + PostToolUse). The np
 
 ## Getting Started
 
-Go to any project directory and create a new life:
+### Single project (flat life)
+
+If this directory is one self-contained project (a repo, your PhD, a side project):
 
 ```bash
-cd ~/my-project
+cd ~/my-research
 ```
 ```
-/new-life
+/new-life          # pick "Single project"
 ```
 
-Claude interviews you about the project (what it's for, what tools you use, your preferences) and sets everything up. Do this once per project directory.
+Done. This directory is now a life. Memory, sessions, and handover all live here.
+
+### Multiple projects (workspace life)
+
+If you work across several projects under one umbrella — e.g., your job has multiple repos:
+
+```bash
+mkdir -p ~/work    # or use an existing parent folder
+cd ~/work
+```
+```
+/new-life          # pick "Workspace"
+```
+
+This creates a workspace life at `~/work`. You don't need to set up each project individually — **projects auto-initialize the first time you work in them**:
+
+```bash
+cd ~/work/project-a
+claude                 # start Claude Code here — project-a is auto-initialized
+```
+
+The first time Claude runs in a child directory, claude-lives creates that project's memory, handover, and session storage automatically. No extra commands needed. Each project gets its own context while inheriting the workspace-level identity and preferences.
+
+### What if child directories already have their own lives?
+
+If you run `/new-life` as a workspace in a directory that already has child `.claude-life` markers, claude-lives detects them and offers to absorb them as projects under the new workspace. This merges their memory data into the workspace structure and removes the child markers.
 
 ## Daily Workflow
 
@@ -281,7 +308,7 @@ If you're coming from [claude-mem](https://github.com/thedotmack/claude-mem) or 
 
 Then import your data using `/import-claude-mem`:
 
-**Per-directory (recommended):**
+**Single project:**
 ```bash
 cd ~/projects/my-research
 ```
@@ -289,12 +316,35 @@ cd ~/projects/my-research
 /import-claude-mem
 ```
 
-claude-lives auto-detects the matching claude-mem project by directory name. Repeat for each project directory.
+claude-lives auto-detects the matching claude-mem project by directory name, creates the life, and imports your memories. Repeat for each project directory.
+
+**Workspace with multiple projects:**
+```bash
+cd ~/work                # parent folder containing project-a/, project-b/, etc.
+```
+```
+/import-claude-mem
+```
+
+claude-lives scans child directories, matches them against your claude-mem projects by name, and shows you the mapping:
+
+```
+| Directory      | claude-mem Project | Observations | Summaries |
+|----------------|--------------------|-------------|-----------|
+| ./project-a/   | project-a          | 80          | 12        |
+| ./project-b/   | PROJECT-B          | 45          | 6         |
+| ./project-c/   | (no match)         | —           | —         |
+| ./project-d/   | (no match)         | —           | —         |
+```
+
+Matched projects are imported with their memories. **Unmatched directories are skipped** — they don't have claude-mem data to import. Those projects will auto-initialize with empty memory the first time you work in them, just like any other workspace project.
 
 **Bulk import:**
 ```
 /import-claude-mem --all
 ```
+
+Imports all claude-mem projects at once, then asks which directories to connect them to.
 
 **Options:**
 - `--dry-run` — preview what would be imported without making changes
