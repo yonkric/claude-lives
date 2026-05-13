@@ -2,6 +2,46 @@
 
 All notable changes to claude-lives are documented here.
 
+## [0.4.0] — 2026-05-12
+
+### A+ Improvements: Accurate Token Counting & Resilience
+
+**New Features:**
+
+- **Tiktoken-based token counting** (`lib/token_count.sh`)
+  - Uses Claude's actual tokenizer (`cl100k_base`) when available
+  - Falls back to 4-char heuristic when tiktoken not installed
+  - New `--info` flag shows active tokenizer
+  - Batch directory counting with Python for efficiency
+  - 13 comprehensive unit tests added
+
+- **Resilience library** (`lib/resilience.sh`)
+  - Disk space checking before write operations
+  - Corrupt marker file detection and automatic repair
+  - Safe file writes with atomic operations, backup, and rollback
+  - Concurrent session detection (prevents conflicts)
+  - Health check diagnostics with JSON output
+  - 10 comprehensive unit tests added
+
+**Testing:**
+- 29 new unit tests (all passing):
+  - Token count: 13 tests (unicode, large files, special chars, consistency)
+  - Life detection: 6 tests
+  - Resilience: 10 tests (validation, repair, safe writes, concurrent sessions)
+
+**API:**
+```bash
+# Token counting
+lib/token_count.sh <file>              # Count tokens in file
+lib/token_count.sh --info              # Show active tokenizer
+
+# Resilience
+lib/resilience.sh validate-marker <file>   # Validate .claude-life format
+lib/resilience.sh repair-marker <file>   # Repair corrupt marker
+lib/resilience.sh health <life-name>     # Health check with JSON output
+lib/resilience.sh check-concurrent <dir> # Check for concurrent sessions
+```
+
 ## [0.3.6] — 2026-05-11
 
 ### Fix CI/CD Trusted Publishing
