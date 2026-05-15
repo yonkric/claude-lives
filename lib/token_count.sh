@@ -76,11 +76,13 @@ count_tokens_file() {
     fi
 
     if check_tiktoken; then
-        # Read file and count with tiktoken
-        local content
-        content=$(cat "$file" 2>/dev/null) || { echo "0"; return 1; }
+        # Count tokens via stdin to avoid ARG_MAX limits on large files
         local count
-        count=$(count_with_tiktoken "$content") && echo "$count" && return 0
+        count=$(python3 -c "
+import tiktoken, sys
+enc = tiktoken.get_encoding('cl100k_base')
+print(len(enc.encode(sys.stdin.read())))
+" < "$file" 2>/dev/null) && [[ "$count" =~ ^[0-9]+$ ]] && echo "$count" && return 0
     fi
 
     # Fallback to heuristic

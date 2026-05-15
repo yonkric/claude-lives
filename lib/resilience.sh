@@ -13,8 +13,12 @@ check_disk_space() {
     local required_mb="${2:-100}"
 
     # Get available space in KB, then convert to MB
+    # Use -Pk for POSIX mode (single-line output, consistent columns)
     local available_kb
-    available_kb=$(df -k "$dir" 2>/dev/null | awk 'NR==2 {print $4}') || available_kb=0
+    available_kb=$(df -Pk "$dir" 2>/dev/null | awk 'NR==2 {print $4}') || available_kb=0
+    if ! [[ "$available_kb" =~ ^[0-9]+$ ]]; then
+        available_kb=0
+    fi
     local available_mb=$((available_kb / 1024))
 
     if [[ "$available_mb" -lt "$required_mb" ]]; then
@@ -99,7 +103,7 @@ EOF
 }
 
 # Safe write with backup and rollback capability
-# Usage: safe_write "source_content" "target_file"
+# Usage: safe_write "content_string" "target_file"
 safe_write() {
     local content="$1"
     local target_file="$2"
@@ -118,9 +122,14 @@ safe_write() {
         cp "$target_file" "${target_file}${backup_suffix}" 2>/dev/null || true
     fi
 
-    # Write to temp file first
-    local temp_file="${target_file}.tmp.$$"
-    if ! echo "$content" > "$temp_file" 2>/dev/null; then
+    # Write to temp file first (mktemp in same dir for atomic mv)
+    local temp_file
+    temp_file=$(mktemp "${target_dir}/$(basename "$target_file").tmp.XXXXXX") || {
+        echo "error: Failed to create temp file in $target_dir"
+        return 1
+    }
+    if ! printf '%s\n' "$content" > "$temp_file" 2>/dev/null; then
+        rm -f "$temp_file" 2>/dev/null
         echo "error: Failed to write temp file $temp_file"
         return 1
     fi
@@ -156,8 +165,8 @@ safe_append() {
     local target_file="$2"
     local pending_file="${target_file}.pending.$$"
 
-    # Write to pending file first
-    echo "$content" >> "$pending_file" 2>/dev/null || {
+    # Write to pending file first (use > not >> to avoid stale data from PID reuse)
+    printf '%s\n' "$content" > "$pending_file" 2>/dev/null || {
         echo "error: Failed to write pending file"
         return 1
     }
@@ -178,21 +187,21 @@ safe_append() {
 process_pending_writes() {
     local dir="$1"
 
-    find "$dir" -name '*.pending.*' -type f 2>/dev/null | while read -r pending_file; do
+    while read -r pending_file; do
         local target_file="${pending_file%.pending.*}"
 
         # Check if pending file is recent (< 24 hours)
-        local age_seconds
-        age_seconds=$(($(date +%s) - $(stat -c %Y "$pending_file" 2>/dev/null || echo 0)))
+        # Use stat -c (GNU) with fallback to stat -f (BSD/macOS)
+        local mod_time
+        mod_time=$(stat -c %Y "$pending_file" 2>/dev/null || stat -f %m "$pending_file" 2>/dev/null || echo 0)
+        local age_seconds=$(( $(date +%s) - mod_time ))
 
         if [[ "$age_seconds" -lt 86400 ]]; then
-            # Append to target
             cat "$pending_file" >> "$target_file" 2>/dev/null && rm "$pending_file" 2>/dev/null
         else
-            # Stale pending file, just remove
             rm "$pending_file" 2>/dev/null
         fi
-    done
+    done < <(find "$dir" -name '*.pending.*' -type f 2>/dev/null)
 }
 
 # Concurrent access detection
@@ -216,8 +225,14 @@ check_concurrent_session() {
         fi
     fi
 
-    # Write current session
-    echo "$current_session" > "$lock_file" 2>/dev/null || true
+    # Atomic write using flock to prevent TOCTOU race
+    (
+        flock -n 200 || { echo "warning: Could not acquire session lock"; return 1; }
+        printf '%s\n' "$current_session" > "$lock_file"
+    ) 200>"${lock_file}.lock" 2>/dev/null || {
+        # Fallback for systems without flock
+        printf '%s\n' "$current_session" > "$lock_file" 2>/dev/null || true
+    }
     return 0
 }
 
@@ -328,9 +343,13 @@ health_check() {
         issues+=("low-disk-space")
     fi
 
-    # Check life marker if exists
-    local life_root
-    life_root=$(find /home -name ".claude-life" -type f 2>/dev/null | head -1 | xargs dirname 2>/dev/null) || life_root=""
+    # Check life marker if exists (search life_dir, not all of /home)
+    local life_root=""
+    local marker_file
+    marker_file=$(find "$life_dir" -maxdepth 2 -name ".claude-life" -type f -print -quit 2>/dev/null) || marker_file=""
+    if [[ -n "$marker_file" ]]; then
+        life_root="$(dirname "$marker_file")"
+    fi
 
     if [[ -n "$life_root" && -f "$life_root/.claude-life" ]]; then
         if [[ "$(validate_life_marker "$life_root/.claude-life")" != "valid" ]]; then
@@ -362,23 +381,26 @@ health_check() {
     fi
 
     # Output JSON
-    local issues_json="[]"
+    local healthy="true"
     if [[ ${#issues[@]} -gt 0 ]]; then
-        issues_json="[$(printf '\"%s\",' "${issues[@]}" | sed 's/,$//')]"
+        healthy="false"
     fi
 
-    cat <<EOF
-{
-  "life": "$life_name",
-  "healthy": $([[ ${#issues[@]} -eq 0 ]] && echo "true" || echo "false"),
-  "issues": $issues_json,
-  "checks": {
-    "disk_space": $(check_disk_space "$life_dir" 50 && echo "true" || echo "false"),
-    "marker_valid": $([[ -n "$life_root" && "$(validate_life_marker "$life_root/.claude-life" 2>/dev/null)" == "valid" ]] && echo "true" || echo "false"),
-    "pending_writes": $pending_count
-  }
-}
-EOF
+    local disk_ok="true"
+    check_disk_space "$life_dir" 50 2>/dev/null || disk_ok="false"
+
+    local marker_ok="false"
+    if [[ -n "$life_root" && "$(validate_life_marker "$life_root/.claude-life" 2>/dev/null)" == "valid" ]]; then
+        marker_ok="true"
+    fi
+
+    local issues_json="[]"
+    if [[ ${#issues[@]} -gt 0 ]]; then
+        issues_json="[$(printf '"%s",' "${issues[@]}" | sed 's/,$//')]"
+    fi
+
+    printf '{"life":"%s","healthy":%s,"issues":%s,"checks":{"disk_space":%s,"marker_valid":%s,"pending_writes":%d}}\n' \
+        "$life_name" "$healthy" "$issues_json" "$disk_ok" "$marker_ok" "$pending_count"
 }
 
 if [[ "${BASH_SOURCE[0]:-}" == "${0}" ]]; then
