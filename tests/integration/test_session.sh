@@ -15,8 +15,10 @@ export CLAUDE_LIVES_DIR="$HOME/.claude-lives"
 source "$PROJECT_ROOT/lib/config_defaults.sh"
 source "$PROJECT_ROOT/lib/detect_life.sh"
 source "$PROJECT_ROOT/lib/resilience.sh"
+set +euo pipefail
 
-trap 'rm -rf "$TEST_DIR"' EXIT
+BG_PIDS=()
+trap 'for p in "${BG_PIDS[@]}"; do kill "$p" 2>/dev/null; wait "$p" 2>/dev/null; done; rm -rf "$TEST_DIR"' EXIT
 
 PASS=0
 FAIL=0
@@ -199,11 +201,11 @@ fi
 
 # Test 8: Health check
 echo "Test 8: Run health check"
-HEALTH=$(health_check "test-life" 2>/dev/null)
-if echo "$HEALTH" | grep -q '"healthy": true'; then
+HEALTH=$(health_check "test-life" 2>/dev/null) || true
+if echo "$HEALTH" | grep -q '"healthy":true'; then
     test_pass "Health check passed"
 else
-    test_pass "Health check completed (may have warnings)"
+    test_fail "Health check reported unhealthy"
 fi
 
 # Test 9: Detect concurrent session
@@ -212,11 +214,9 @@ mkdir -p "$CLAUDE_LIVES_DIR/concurrent-test"
 # Create a background process and use its PID
 (sleep 30) &
 BG_PID=$!
-# Give the process time to start
-sleep 0.1
+BG_PIDS+=("$BG_PID")
+sleep 0.5
 echo "$BG_PID" > "$CLAUDE_LIVES_DIR/concurrent-test/.session-active"
-echo "Created background process $BG_PID"
-ps aux | grep "$BG_PID" | grep -v grep || echo "Process check"
 result=$(bash "$PROJECT_ROOT/lib/resilience.sh" check-concurrent "$CLAUDE_LIVES_DIR/concurrent-test" 99999 2>&1)
 echo "Check result: $result"
 if echo "$result" | grep -q "Another session"; then
@@ -224,8 +224,8 @@ if echo "$result" | grep -q "Another session"; then
 else
     test_fail "Concurrent session not detected"
 fi
-# Clean up background process - kill but don't wait (avoid 30s delay)
 kill "$BG_PID" 2>/dev/null || true
+wait "$BG_PID" 2>/dev/null || true
 
 # Test 10: Repair corrupt marker
 echo "Test 10: Repair corrupt marker"

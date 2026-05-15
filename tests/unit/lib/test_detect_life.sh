@@ -4,6 +4,7 @@
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]:-}")" && pwd)"
 LIB_DIR="$(cd "$SCRIPT_DIR/../../../lib" && pwd)"
 source "$LIB_DIR/detect_life.sh"
+set +euo pipefail
 
 # Test counters
 TESTS_RUN=0

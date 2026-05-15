@@ -144,11 +144,11 @@ session_count: 0
 # Memory
 EOF
 
-health_output=$(bash "$RESILIENCE" health "healthy-life" 2>/dev/null)
-if echo "$health_output" | grep -q '"healthy": true'; then
+health_output=$(bash "$RESILIENCE" health "healthy-life" 2>/dev/null) || true
+if echo "$health_output" | grep -q '"healthy":true'; then
     pass "Health check passed"
 else
-    pass "Health check completed (may have warnings)"
+    fail "Health check reported unhealthy"
 fi
 
 # Test 10: Concurrent session detection
@@ -157,14 +157,15 @@ mkdir -p "$CLAUDE_LIVES_DIR/concurrent-test"
 # Create a background process and use its PID
 (sleep 10) &
 BG_PID=$!
+sleep 0.5
 echo "$BG_PID" > "$CLAUDE_LIVES_DIR/concurrent-test/.session-active"
 if bash "$RESILIENCE" check-concurrent "$CLAUDE_LIVES_DIR/concurrent-test" 99999 2>&1 | grep -q "Another session"; then
     pass "Concurrent session detected"
 else
     fail "Concurrent session not detected"
 fi
-# Clean up background process
 kill "$BG_PID" 2>/dev/null || true
+wait "$BG_PID" 2>/dev/null || true
 
 # Summary
 echo ""

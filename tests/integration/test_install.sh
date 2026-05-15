@@ -37,7 +37,7 @@ mkdir -p "$HOME/.claude/hooks"
 
 # Test 1: Run installer
 echo "Test 1: Run install script"
-if bash "$PROJECT_ROOT/install.sh" --dry-run 2>/dev/null || true; then
+if bash "$PROJECT_ROOT/install.sh" --dry-run 2>&1; then
     test_pass "Install script runs without errors"
 else
     test_fail "Install script failed"
