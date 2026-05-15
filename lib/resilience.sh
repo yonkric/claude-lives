@@ -208,8 +208,8 @@ check_concurrent_session() {
         other_session=$(cat "$lock_file" 2>/dev/null) || other_session=""
 
         if [[ -n "$other_session" && "$other_session" != "$current_session" ]]; then
-            # Check if the other process is still running
-            if kill -0 "$other_session" 2>/dev/null; then
+            # Validate PID is numeric before using with kill
+            if [[ "$other_session" =~ ^[0-9]+$ ]] && kill -0 "$other_session" 2>/dev/null; then
                 echo "warning: Another session is active (PID: $other_session)"
                 return 1
             fi
@@ -281,6 +281,12 @@ repair_claude_md_markers() {
     local life_name="$2"
     local injection_content="${3:-}"
 
+    # Validate life_name contains only safe characters
+    if [[ ! "$life_name" =~ ^[a-zA-Z0-9_-]+$ ]]; then
+        echo "error: Invalid life name for marker repair: $life_name"
+        return 1
+    fi
+
     echo "Repairing CLAUDE.md markers for $life_name..."
 
     # Default content if none provided
@@ -292,11 +298,11 @@ repair_claude_md_markers() {
 *Context reconstructed automatically.*"
     fi
 
-    # Remove any malformed markers first
-    sed -i '/<!-- CLAUDE-LIVES:START/,/<!-- CLAUDE-LIVES:END -->/d' "$claude_md" 2>/dev/null || true
+    # Remove markers for this specific life only
+    sed -i "/<!-- CLAUDE-LIVES:START:${life_name} -->/,/<!-- CLAUDE-LIVES:END -->/d" "$claude_md" 2>/dev/null || true
 
-    # Also remove any partial markers
-    sed -i '/<!-- CLAUDE-LIVES:/d' "$claude_md" 2>/dev/null || true
+    # Remove any orphaned partial markers for this life
+    sed -i "/<!-- CLAUDE-LIVES:START:${life_name}/d" "$claude_md" 2>/dev/null || true
 
     # Append fresh markers
     cat >> "$claude_md" <<EOF

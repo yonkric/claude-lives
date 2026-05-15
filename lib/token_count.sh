@@ -93,17 +93,16 @@ count_tokens_dir() {
     local dir="$1"
 
     if check_tiktoken; then
-        # Use Python for efficient batch processing with tiktoken
-        python3 <<EOF 2>/dev/null
+        DIR_PATH="$dir" python3 <<'EOF' 2>/dev/null
 import tiktoken
 import os
-import sys
 
 enc = tiktoken.get_encoding('cl100k_base')
 total = 0
+dir_path = os.environ['DIR_PATH']
 
 try:
-    for root, dirs, files in os.walk('$dir'):
+    for root, dirs, files in os.walk(dir_path):
         for filename in files:
             if filename.endswith('.md'):
                 filepath = os.path.join(root, filename)
@@ -131,6 +130,104 @@ EOF
     echo "$total"
 }
 
+# Batch count multiple files efficiently
+batch_count_tokens() {
+    if check_tiktoken && [[ $# -gt 0 ]]; then
+        python3 - "$@" <<'EOF' 2>/dev/null
+import tiktoken
+import sys
+
+enc = tiktoken.get_encoding('cl100k_base')
+total = 0
+
+for filepath in sys.argv[1:]:
+    try:
+        with open(filepath, 'r', encoding='utf-8') as f:
+            content = f.read()
+            total += len(enc.encode(content))
+    except Exception:
+        pass
+
+print(total)
+EOF
+    else
+        local total_chars=0
+        for file in "$@"; do
+            if [[ -f "$file" ]]; then
+                local chars
+                chars=$(wc -c < "$file" 2>/dev/null | tr -d ' ' || echo "0")
+                total_chars=$((total_chars + chars))
+            fi
+        done
+        echo $(( (total_chars + 3) / 4 ))
+    fi
+}
+
+# Get budget status for a life
+get_budget_status() {
+    local life_name="$1"
+    local project_name="${2:-}"
+
+    local script_dir
+    script_dir="$(cd "$(dirname "${BASH_SOURCE[0]:-}")" && pwd)"
+    source "$script_dir/config_defaults.sh"
+
+    local lives_dir="${CLAUDE_LIVES_DIR:-$HOME/.claude-lives}"
+    local life_dir="$lives_dir/$life_name"
+
+    local memory_file
+    local handover_file
+
+    if [[ -n "$project_name" ]]; then
+        memory_file="$life_dir/projects/$project_name/memory.md"
+        handover_file="$life_dir/projects/$project_name/handover.md"
+    else
+        memory_file="$life_dir/memory.md"
+        handover_file="$life_dir/handover.md"
+    fi
+
+    local budget=4000
+    if [[ -f "$life_dir/config.yaml" ]]; then
+        local config_budget
+        config_budget=$(grep -E '^life_token_budget:' "$life_dir/config.yaml" 2>/dev/null | sed 's/^life_token_budget:[[:space:]]*//' | tr -d ' ' || echo "")
+        if [[ "$config_budget" =~ ^[0-9]+$ ]] && (( config_budget > 0 )); then
+            budget="$config_budget"
+        fi
+    fi
+
+    local memory_tokens=0
+    local handover_tokens=0
+
+    if [[ -f "$memory_file" ]]; then
+        memory_tokens=$(count_tokens_file "$memory_file")
+    fi
+
+    if [[ -f "$handover_file" ]]; then
+        handover_tokens=$(count_tokens_file "$handover_file")
+    fi
+
+    local total_tokens=$((memory_tokens + handover_tokens))
+    local percentage=$((total_tokens * 100 / budget))
+    local using_tiktoken
+    using_tiktoken=$(check_tiktoken && echo "true" || echo "false")
+
+    if command -v jq &>/dev/null; then
+        jq -n \
+            --arg life "$life_name" \
+            --arg project "${project_name:-(life-level)}" \
+            --argjson budget "$budget" \
+            --argjson memory_tokens "$memory_tokens" \
+            --argjson handover_tokens "$handover_tokens" \
+            --argjson total_tokens "$total_tokens" \
+            --argjson percentage "$percentage" \
+            --argjson using_tiktoken "$using_tiktoken" \
+            '{life: $life, project: $project, budget: $budget, memory_tokens: $memory_tokens, handover_tokens: $handover_tokens, total_tokens: $total_tokens, percentage: $percentage, warning_threshold: 80, critical_threshold: 95, using_tiktoken: $using_tiktoken}'
+    else
+        printf '{"life":"%s","project":"%s","budget":%d,"memory_tokens":%d,"handover_tokens":%d,"total_tokens":%d,"percentage":%d,"warning_threshold":80,"critical_threshold":95,"using_tiktoken":%s}\n' \
+            "$life_name" "${project_name:-(life-level)}" "$budget" "$memory_tokens" "$handover_tokens" "$total_tokens" "$percentage" "$using_tiktoken"
+    fi
+}
+
 # Get tokenization method info
 get_tokenizer_info() {
     if check_tiktoken; then
@@ -147,6 +244,14 @@ if [[ "${BASH_SOURCE[0]:-}" == "${0}" ]]; then
             ;;
         --dir)
             count_tokens_dir "${2:-.}"
+            ;;
+        --batch)
+            shift
+            batch_count_tokens "$@"
+            ;;
+        --status)
+            shift
+            get_budget_status "$@"
             ;;
         --check)
             if check_tiktoken; then
