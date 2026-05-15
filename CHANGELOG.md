@@ -9,37 +9,52 @@ All notable changes to claude-lives are documented here.
 **New Features:**
 
 - **Tiktoken-based token counting** (`lib/token_count.sh`)
-  - Uses Claude's actual tokenizer (`cl100k_base`) when available
+  - Uses tiktoken (`cl100k_base`) for improved token estimation when available
   - Falls back to 4-char heuristic when tiktoken not installed
   - New `--info` flag shows active tokenizer
-  - Batch directory counting with Python for efficiency
+  - Batch file counting (`--batch`) and budget status (`--status`) commands
+  - Large file support via stdin (avoids ARG_MAX limits)
   - 13 comprehensive unit tests added
 
 - **Resilience library** (`lib/resilience.sh`)
-  - Disk space checking before write operations
+  - Disk space checking before write operations (POSIX-compatible `df -Pk`)
   - Corrupt marker file detection and automatic repair
-  - Safe file writes with atomic operations, backup, and rollback
-  - Concurrent session detection (prevents conflicts)
+  - Safe file writes with atomic operations (`mktemp` + `mv`), backup, and rollback
+  - Concurrent session detection with `flock`-based atomic locking
   - Health check diagnostics with JSON output
+  - Input validation on PIDs and life names
   - 10 comprehensive unit tests added
 
 **Testing:**
-- 29 new unit tests (all passing):
+- 29 new unit and integration tests (all passing):
   - Token count: 13 tests (unicode, large files, special chars, consistency)
   - Life detection: 6 tests
   - Resilience: 10 tests (validation, repair, safe writes, concurrent sessions)
+  - Integration: install flow and end-to-end session workflow tests
+- Test runner (`tests/run_all.sh`) rewritten with structured result parsing
+
+**Security (audit fixes applied):**
+- Removed `token_count_v2.sh` (had command injection via Python triple-quote interpolation)
+- Fixed heredoc injection in `count_tokens_dir()` (quoted heredoc + env var)
+- Fixed TOCTOU race condition in session locking (now uses `flock`)
+- Added PID validation before `kill -0` in concurrent session check
+- Added life name validation in `repair_claude_md_markers()`
+- Scoped sed marker deletion to specific life (was deleting all lives' markers)
+- Division-by-zero guard in budget status
 
 **API:**
 ```bash
 # Token counting
-lib/token_count.sh <file>              # Count tokens in file
-lib/token_count.sh --info              # Show active tokenizer
+lib/token_count.sh <file>                # Count tokens in file
+lib/token_count.sh --info                # Show active tokenizer
+lib/token_count.sh --batch f1 f2 ...     # Batch count multiple files
+lib/token_count.sh --status <life>       # Budget status (JSON)
 
 # Resilience
 lib/resilience.sh validate-marker <file>   # Validate .claude-life format
-lib/resilience.sh repair-marker <file>   # Repair corrupt marker
-lib/resilience.sh health <life-name>     # Health check with JSON output
-lib/resilience.sh check-concurrent <dir> # Check for concurrent sessions
+lib/resilience.sh repair-marker <file>     # Repair corrupt marker
+lib/resilience.sh health <life-name>       # Health check with JSON output
+lib/resilience.sh check-concurrent <dir>   # Check for concurrent sessions
 ```
 
 ## [0.3.6] — 2026-05-11
