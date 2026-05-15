@@ -33,7 +33,8 @@ TEMP_DIR=$(mktemp -d)
 export CLAUDE_LIVES_DIR="$TEMP_DIR/claude-lives"
 mkdir -p "$CLAUDE_LIVES_DIR"
 
-trap 'rm -rf "$TEMP_DIR"' EXIT
+BG_PIDS=()
+trap 'for p in "${BG_PIDS[@]}"; do kill "$p" 2>/dev/null; wait "$p" 2>/dev/null; done; rm -rf "$TEMP_DIR"' EXIT
 
 echo "================================"
 echo "Resilience Unit Tests"
@@ -157,6 +158,7 @@ mkdir -p "$CLAUDE_LIVES_DIR/concurrent-test"
 # Create a background process and use its PID
 (sleep 10) &
 BG_PID=$!
+BG_PIDS+=("$BG_PID")
 sleep 0.5
 echo "$BG_PID" > "$CLAUDE_LIVES_DIR/concurrent-test/.session-active"
 if bash "$RESILIENCE" check-concurrent "$CLAUDE_LIVES_DIR/concurrent-test" 99999 2>&1 | grep -q "Another session"; then

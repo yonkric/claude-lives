@@ -95,7 +95,8 @@ count_tokens_dir() {
     local dir="$1"
 
     if check_tiktoken; then
-        DIR_PATH="$dir" python3 <<'EOF' 2>/dev/null
+        local result
+        result=$(DIR_PATH="$dir" python3 <<'EOF' 2>/dev/null
 import tiktoken
 import os
 
@@ -118,7 +119,11 @@ try:
 except Exception:
     print(0)
 EOF
-        return
+)
+        if [[ "$result" =~ ^[0-9]+$ ]]; then
+            echo "$result"
+            return
+        fi
     fi
 
     # Fallback: heuristic-based counting

@@ -33,7 +33,7 @@ run_test_file() {
         echo "========================================"
 
         local output exit_code
-        output=$(bash "$test_file" 2>&1) || true
+        output=$(bash "$test_file" 2>&1)
         exit_code=$?
         echo "$output"
 
